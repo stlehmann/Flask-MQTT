@@ -3,6 +3,9 @@ from threading import Thread
 from paho.mqtt.client import Client, MQTTMessage
 
 
+__version__ = '0.0.1'
+
+
 class Flask_MQTT():
 
     def __init__(self, app=None):
