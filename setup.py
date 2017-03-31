@@ -1,10 +1,9 @@
 from setuptools import setup
-from flask_mqtt import __version__
 
 
 setup(
     name='Flask-MQTT',
-    version=__version__,
+    version='0.0.1',
     url='https://github.com/MrLeeh/Flask-MQTT',
     license='MIT',
     author='Stefan Lehmann',
