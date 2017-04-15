@@ -23,19 +23,26 @@ class Mqtt():
         self.connect()
 
     def connect(self):
-        self.client.username_pw_set(self.app.config['MQTT_USERNAME'],
-                                    self.app.config['MQTT_PASSWORD'])
-        res = self.client.connect(self.app.config['MQTT_BROKER_URL'],
-                                  self.app.config['MQTT_BROKER_PORT'])
-        if res == 0:
-            self.mqtt_thread.start()
+        if not self.mqtt_thread.is_alive():
+
+            if 'MQTT_USERNAME' in self.app.config:
+                self.client.username_pw_set(self.app.config['MQTT_USERNAME'],
+                                            self.app.config['MQTT_PASSWORD'])
+
+            res = self.client.connect(
+                self.app.config.get('MQTT_BROKER_URL', 'localhost'),
+                self.app.config.get('MQTT_BROKER_PORT', 1883)
+            )
+
+            if res == 0:
+                self.mqtt_thread.start()
 
     def disconnect(self):
         self.client.disconnect()
 
     def loop_forever(self):
         while True:
-            time.sleep(self.app.config['MQTT_REFRESH_TIME'])
+            time.sleep(self.app.config.get('MQTT_REFRESH_TIME', 1.0))
             self.client.loop(timeout=1.0, max_packets=1)
 
     def on_topic(self, topic):
