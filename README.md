@@ -1,6 +1,9 @@
 # Flask-MQTT
 
-Flask Extension for the MQTT protocol
+Flask Extension for the [MQTT protocol][1]. It is based on the package
+[paho-mqtt][0] and aimes to simplify MQTT integration in Flask. MQTT is a
+machine-to-machine "Internet of Things" protocol and was designed for extremely
+lightweight publish/subscribe messaging transport.
 
 ## Installation
 
@@ -71,3 +74,6 @@ To publish a message you can use the `publish()` method.
 ```python
 mqtt.publish('home/mytopic', 'this is my message')
 ```
+
+[0]: https://github.com/eclipse/paho.mqtt.python
+[1]: http://mqtt.org/
