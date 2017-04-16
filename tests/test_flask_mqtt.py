@@ -1,4 +1,5 @@
 import unittest
+import time
 from flask import Flask
 from flask_mqtt import Mqtt
 
@@ -36,3 +37,19 @@ class FlaskMQTTTestCase(unittest.TestCase):
         self.mqtt.unsubscribe_all()
         self.assertEqual(0, len(self.mqtt.topics))
         self.mqtt.disconnect()
+
+    def test_publish(self):
+
+        self.mqtt = Mqtt(self.app)
+
+        @self.mqtt.on_message()
+        def handle_message(client, userdata, message):
+            print(message)
+
+        @self.mqtt.on_topic('test')
+        def handle_on_topic(*args, **kwargs):
+            pass
+
+        self.mqtt.subscribe('test')
+        self.mqtt.publish('test', 'hello world')
+        time.sleep(2)
