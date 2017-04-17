@@ -1,5 +1,5 @@
 .. Flask-MQTT documentation master file, created by
-   sphinx-quickstart on Sun Apr 16 19:31:46 2017.
+   sphinx-quickstart on Mon Apr 17 10:26:02 2017.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
@@ -11,8 +11,6 @@ Welcome to Flask-MQTT's documentation!
    :caption: Contents:
 
    flask_mqtt
-
-
 
 Indices and tables
 ==================
