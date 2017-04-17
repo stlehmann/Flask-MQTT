@@ -5,6 +5,8 @@ Flask Extension for the [MQTT protocol][1]. It is based on the package
 machine-to-machine "Internet of Things" protocol and was designed for extremely
 lightweight publish/subscribe messaging transport.
 
+[![Documentation Status](https://readthedocs.org/projects/flask-mqtt/badge/?version=latest)](http://flask-mqtt.readthedocs.io/en/latest/?badge=latest) [![PyPI version](https://badge.fury.io/py/Flask-MQTT.svg)](https://badge.fury.io/py/Flask-MQTT)
+
 Find the documentation on [http://flask-mqtt.readthedocs.io][2].
 
 ## Installation
