@@ -16,6 +16,7 @@ or monitor and control these devices from one or multiple clients.
 .. toctree::
    :maxdepth: 2
 
+   configuration
    api/index
 
 Support
