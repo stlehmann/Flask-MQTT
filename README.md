@@ -9,6 +9,19 @@ lightweight publish/subscribe messaging transport.
 
 Find the documentation on [http://flask-mqtt.readthedocs.io][2].
 
+## Features
+
+* configuration via Flask config variables
+* auto-connect on start of your web application
+* publish and subscribe messages
+* use callbacks for certain topics
+* use one callback for all subscribed topics
+
+## Todo
+
+* SSL support
+* auto-reconnect after broker went down
+
 ## Installation
 
 Simply install the package as usual via pip:
