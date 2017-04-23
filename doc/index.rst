@@ -17,6 +17,7 @@ or monitor and control these devices from one or multiple clients.
    :maxdepth: 2
 
    configuration
+   usage
    api/index
 
 Support

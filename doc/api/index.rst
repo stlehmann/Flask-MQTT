@@ -1,5 +1,5 @@
-API
-===
+API Documentation
+=================
 
 .. automodule:: flask_mqtt
     :members:
