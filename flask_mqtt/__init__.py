@@ -27,14 +27,23 @@ class Mqtt():
             username=app.config.get('MQTT_USERNAME'),
             password=app.config.get('MQTT_PASSWORD'),
             broker_url=app.config.get('MQTT_BROKER_URL', 'localhost'),
-            broker_port=app.config.get('MQTT_BROKER_PORT', 1883)
+            broker_port=app.config.get('MQTT_BROKER_PORT', 1883),
+            tls_insecure=app.config.get('TLS_INSECURE', False),
+            ca_file_path=app.config.get('CA_FILE_PATH', None)
         )
 
-    def _connect(self, username, password, broker_url, broker_port):
+    def _connect(self, username, password, broker_url, broker_port,
+                 tls_insecure, ca_file_path):
         if not self.mqtt_thread.is_alive():
 
             if username is not None:
                 self.client.username_pw_set(username, password)
+
+            if tls_insecure:
+                self.client.tls_insecure_set(tls_insecure)
+
+            if ca_file_path:
+                self.client.tls_set(ca_certs=ca_file_path)
 
             res = self.client.connect(broker_url, broker_port)
 
