@@ -28,8 +28,8 @@ class Mqtt():
             password=app.config.get('MQTT_PASSWORD'),
             broker_url=app.config.get('MQTT_BROKER_URL', 'localhost'),
             broker_port=app.config.get('MQTT_BROKER_PORT', 1883),
-            tls_insecure=app.config.get('TLS_INSECURE', False),
-            ca_file_path=app.config.get('CA_FILE_PATH', None)
+            tls_insecure=app.config.get('MQTT_TLS_INSECURE', False),
+            ca_file_path=app.config.get('MQTT_CA_FILE_PATH', None)
         )
 
     def _connect(self, username, password, broker_url, broker_port,
