@@ -5,7 +5,7 @@ from threading import Thread
 from paho.mqtt.client import Client, MQTT_ERR_SUCCESS
 
 
-__version__ = '0.0.1'
+__version__ = '0.0.2'
 
 
 class Mqtt():
