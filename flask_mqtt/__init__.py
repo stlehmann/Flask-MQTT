@@ -1,4 +1,5 @@
 import time
+import ssl
 from typing import Tuple
 from threading import Thread
 from paho.mqtt.client import Client, MQTT_ERR_SUCCESS
@@ -23,20 +24,40 @@ class Mqtt():
     def init_app(self, app):
         self.refresh_time = app.config.get('MQTT_REFRESH_TIME', 1.0)
 
-        self._connect(
-            username=app.config.get('MQTT_USERNAME'),
-            password=app.config.get('MQTT_PASSWORD'),
-            broker_url=app.config.get('MQTT_BROKER_URL', 'localhost'),
-            broker_port=app.config.get('MQTT_BROKER_PORT', 1883)
-        )
+        self.username = app.config.get('MQTT_USERNAME')
+        self.password = app.config.get('MQTT_PASSWORD')
+        self.broker_url = app.config.get('MQTT_BROKER_URL', 'localhost')
+        self.broker_port = app.config.get('MQTT_BROKER_PORT', 1883)
+        self.tls_enabled = app.config.get('MQTT_TLS_ENABLED', False)
+        self.tls_ca_certs = app.config.get('MQTT_TLS_CA_CERTS', [])
+        self.tls_certfile = app.config.get('MQTT_TLS_CERTFILE')
+        self.tls_cert_reqs = app.config.get('MQTT_TLS_CERT_REQS', ssl.CERT_REQUIRED)
+        self.tls_version = app.config.get('MQTT_TLS_VERSION', ssl.PROTOCOL_TLSv1)
+        self.tls_ciphers = app.config.get('MQTT_TLS_CIPHERS')
+        self.tls_insecure = app.config.get('MQTT_TLS_INSECURE', False)
 
-    def _connect(self, username, password, broker_url, broker_port):
+        self._connect()
+
+    def _connect(self):
         if not self.mqtt_thread.is_alive():
 
-            if username is not None:
-                self.client.username_pw_set(username, password)
+            if self.username is not None:
+                self.client.username_pw_set(self.username, self.password)
 
-            res = self.client.connect(broker_url, broker_port)
+            # security
+            if self.tls_insecure:
+                self.client.tls_insecure_set(self.tls_insecure)
+
+            if self.tls_enabled:
+                self.client.tls_set(
+                    ca_certs=self.tls_ca_certs,
+                    certfile=self.tls_certfile,
+                    cert_reqs=self.tls_cert_reqs,
+                    tls_version=self.tls_version,
+                    ciphers=self.tls_ciphers,
+                )
+
+            res = self.client.connect(self.broker_url, self.broker_port)
 
             if res == 0:
                 self.mqtt_thread.start()
