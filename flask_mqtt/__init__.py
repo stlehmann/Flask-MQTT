@@ -29,13 +29,15 @@ class Mqtt():
         self.broker_url = app.config.get('MQTT_BROKER_URL', 'localhost')
         self.broker_port = app.config.get('MQTT_BROKER_PORT', 1883)
         self.tls_enabled = app.config.get('MQTT_TLS_ENABLED', False)
-        self.tls_ca_certs = app.config.get('MQTT_TLS_CA_CERTS', [])
-        self.tls_certfile = app.config.get('MQTT_TLS_CERTFILE')
-        self.tls_keyfile = app.config.get('MQTT_TLS_KEYFILE')
-        self.tls_cert_reqs = app.config.get('MQTT_TLS_CERT_REQS', ssl.CERT_REQUIRED)
-        self.tls_version = app.config.get('MQTT_TLS_VERSION', ssl.PROTOCOL_TLSv1)
-        self.tls_ciphers = app.config.get('MQTT_TLS_CIPHERS')
-        self.tls_insecure = app.config.get('MQTT_TLS_INSECURE', False)
+
+        if self.tls_enabled:
+            self.tls_ca_certs = app.config['MQTT_TLS_CA_CERTS']
+            self.tls_certfile = app.config.get('MQTT_TLS_CERTFILE')
+            self.tls_keyfile = app.config.get('MQTT_TLS_KEYFILE')
+            self.tls_cert_reqs = app.config.get('MQTT_TLS_CERT_REQS', ssl.CERT_REQUIRED)
+            self.tls_version = app.config.get('MQTT_TLS_VERSION', ssl.PROTOCOL_TLSv1)
+            self.tls_ciphers = app.config.get('MQTT_TLS_CIPHERS')
+            self.tls_insecure = app.config.get('MQTT_TLS_INSECURE', False)
 
         self._connect()
 
@@ -46,10 +48,10 @@ class Mqtt():
                 self.client.username_pw_set(self.username, self.password)
 
             # security
-            if self.tls_insecure:
-                self.client.tls_insecure_set(self.tls_insecure)
-
             if self.tls_enabled:
+                if self.tls_insecure:
+                    self.client.tls_insecure_set(self.tls_insecure)
+
                 self.client.tls_set(
                     ca_certs=self.tls_ca_certs,
                     certfile=self.tls_certfile,
