@@ -30,8 +30,11 @@ Configuration Keys
                                to ``None``. Only needed if a username is
                                provided.
 
-``MQTT_REFRESH_TIME``          The refresh interval in seconds used to check
-                               for pending messages. Defaults to 1.0 seconds.
+``MQTT_KEEPALIVE``             Maximum period in seconds between communications 
+                               with the broker. If no other messages are being 
+                               exchanged, this controls the rate at which the 
+                               client will send ping messages to the broker.
+                               Defaults to 60 seconds.
 
 ``MQTT_TLS_ENABLED``           Enable TLS for the connection to the MQTT broker.
                                Use the following config keys to configure TLS.

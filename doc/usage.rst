@@ -98,8 +98,8 @@ method here.
     mqtt.publish('home/mytopic', 'hello world')
 
 
-Log MQTT Error message
-----------------------
+Logging
+-------
 To enable logging there exists the :py:func:`flask_mqtt.Mqtt.on_log` decorator.
 The level variable gives the severity of the message and will be one of these:
 

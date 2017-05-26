@@ -89,3 +89,4 @@ ENV/
 .ropeproject
 *.sublime*
 doc/_build/*
+*.crt
