@@ -12,20 +12,21 @@ class Mqtt():
     def __init__(self, app=None):
         self.app = app
         self.client = Client()
-        self.refresh_time = 1.0
+        self.client.on_connect = self._handle_connect
+        self.client.on_disconnect = self._handle_disconnect
         self.topics = []
+        self.connected = False
 
         if app is not None:
             self.init_app(app)
 
     def init_app(self, app):
-        self.refresh_time = app.config.get('MQTT_REFRESH_TIME', 1.0)
-
         self.username = app.config.get('MQTT_USERNAME')
         self.password = app.config.get('MQTT_PASSWORD')
         self.broker_url = app.config.get('MQTT_BROKER_URL', 'localhost')
         self.broker_port = app.config.get('MQTT_BROKER_PORT', 1883)
         self.tls_enabled = app.config.get('MQTT_TLS_ENABLED', False)
+        self.keepalive = app.config.get('MQTT_KEEPALIVE', 60)
 
         if self.tls_enabled:
             self.tls_ca_certs = app.config['MQTT_TLS_CA_CERTS']
@@ -58,10 +59,22 @@ class Mqtt():
             )
 
         self.client.loop_start()
-        res = self.client.connect(self.broker_url, self.broker_port)
+        res = self.client.connect_async(
+                self.broker_url, self.broker_port,
+                keepalive=self.keepalive
+        )
 
     def _disconnect(self):
         self.client.disconnect()
+
+    def _handle_connect(self, client, userdata, flags, rc):
+        if rc == MQTT_ERR_SUCCESS:
+            self.connected = True
+            for topic in self.topics:
+                self.client.subscribe(topic)
+
+    def _handle_disconnect(self, client: str, userdata, rc):
+        self.connected = False
 
     def on_topic(self, topic: str):
         """
@@ -167,6 +180,8 @@ class Mqtt():
                   ID for the publish request.
 
         """
+        if not self.connected:
+            self.client.reconnect()
         return self.client.publish(topic, payload, qos, retain)
 
     def on_message(self):
@@ -187,3 +202,22 @@ class Mqtt():
             self.client.on_message = handler
             return handler
         return decorator
+
+    def on_log(self):
+        """
+        Decorator to handle MQTT logging.
+
+        **Example Usage:**
+
+        ::
+            
+            @mqtt.on_log()
+            def handle_logging(client, userdata, level, buf):
+                print(client, userdata, level, buf)
+
+        """
+        def decorator(handler):
+            self.client.on_log = handler
+            return handler
+        return decorator
+
