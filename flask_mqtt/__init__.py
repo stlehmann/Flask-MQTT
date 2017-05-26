@@ -1,7 +1,6 @@
 import time
 import ssl
 from typing import Tuple
-from threading import Thread
 from paho.mqtt.client import Client, MQTT_ERR_SUCCESS
 
 
@@ -15,8 +14,6 @@ class Mqtt():
         self.client = Client()
         self.refresh_time = 1.0
         self.topics = []
-        self.mqtt_thread = Thread(target=self._loop_forever)
-        self.mqtt_thread.daemon = True
 
         if app is not None:
             self.init_app(app)
@@ -42,37 +39,29 @@ class Mqtt():
         self._connect()
 
     def _connect(self):
-        if not self.mqtt_thread.is_alive():
 
-            if self.username is not None:
-                self.client.username_pw_set(self.username, self.password)
+        if self.username is not None:
+            self.client.username_pw_set(self.username, self.password)
 
-            # security
-            if self.tls_enabled:
-                if self.tls_insecure:
-                    self.client.tls_insecure_set(self.tls_insecure)
+        # security
+        if self.tls_enabled:
+            if self.tls_insecure:
+                self.client.tls_insecure_set(self.tls_insecure)
 
-                self.client.tls_set(
-                    ca_certs=self.tls_ca_certs,
-                    certfile=self.tls_certfile,
-                    keyfile=self.tls_keyfile,
-                    cert_reqs=self.tls_cert_reqs,
-                    tls_version=self.tls_version,
-                    ciphers=self.tls_ciphers,
-                )
+            self.client.tls_set(
+                ca_certs=self.tls_ca_certs,
+                certfile=self.tls_certfile,
+                keyfile=self.tls_keyfile,
+                cert_reqs=self.tls_cert_reqs,
+                tls_version=self.tls_version,
+                ciphers=self.tls_ciphers,
+            )
 
-            res = self.client.connect(self.broker_url, self.broker_port)
-
-            if res == 0:
-                self.mqtt_thread.start()
+        self.client.loop_start()
+        res = self.client.connect(self.broker_url, self.broker_port)
 
     def _disconnect(self):
         self.client.disconnect()
-
-    def _loop_forever(self):
-        while True:
-            time.sleep(self.refresh_time)
-            self.client.loop(timeout=1.0, max_packets=1)
 
     def on_topic(self, topic: str):
         """
