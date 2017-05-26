@@ -12,13 +12,13 @@ class FlaskMQTTTestCase(unittest.TestCase):
 
     def test_simple_connect(self):
         self.mqtt = Mqtt(self.app)
-        self.mqtt.disconnect()
+        self.mqtt._disconnect()
 
     def test_connect_with_username(self):
         self.app.config['MQTT_USERNAME'] = 'user'
         self.app.config['MQTT_PASSWORD'] = 'secret'
         self.mqtt = Mqtt(self.app)
-        self.mqtt.disconnect()
+        self.mqtt._disconnect()
 
     def test_subscribe(self):
         self.mqtt = Mqtt(self.app)
@@ -36,7 +36,7 @@ class FlaskMQTTTestCase(unittest.TestCase):
         self.assertEqual(2, len(self.mqtt.topics))
         self.mqtt.unsubscribe_all()
         self.assertEqual(0, len(self.mqtt.topics))
-        self.mqtt.disconnect()
+        self.mqtt._disconnect()
 
     def test_publish(self):
 

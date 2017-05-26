@@ -38,7 +38,8 @@
     socket.on('mqtt_message', function(data) {
       console.log(data);
       var text = '(' + data['topic'] + ') ' + data['payload'];
-      $('#subscribe_messages').append(text + '&#13;&#10;');
+      var $textarea = $('#subscribe_messages');
+      $textarea.val($textarea.val() + text + '\n');
     })
   });
 </script>

@@ -10,7 +10,7 @@ if sys.argv[-1] == 'test':
 else:
     setup(
         name='Flask-MQTT',
-        version='0.0.1',
+        version='0.0.3',
         url='https://github.com/MrLeeh/Flask-MQTT',
         license='MIT',
         author='Stefan Lehmann',
