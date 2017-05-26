@@ -1,10 +1,16 @@
 import time
 import ssl
 from typing import Tuple
-from paho.mqtt.client import Client, MQTT_ERR_SUCCESS
+from paho.mqtt.client import Client, MQTT_ERR_SUCCESS, MQTT_ERR_ACL_DENIED, \
+    MQTT_ERR_AGAIN, MQTT_ERR_AUTH, MQTT_ERR_CONN_LOST, MQTT_ERR_CONN_REFUSED, \
+    MQTT_ERR_ERRNO, MQTT_ERR_INVAL, MQTT_ERR_NO_CONN, MQTT_ERR_NOMEM, \
+    MQTT_ERR_NOT_FOUND, MQTT_ERR_NOT_SUPPORTED, MQTT_ERR_PAYLOAD_SIZE, \
+    MQTT_ERR_PROTOCOL, MQTT_ERR_QUEUE_SIZE, MQTT_ERR_TLS, MQTT_ERR_UNKNOWN, \
+    MQTT_LOG_DEBUG, MQTT_LOG_ERR, MQTT_LOG_INFO, MQTT_LOG_NOTICE, \
+    MQTT_LOG_WARNING
 
 
-__version__ = '0.0.2'
+__version__ = '0.0.3'
 
 
 class Mqtt():
