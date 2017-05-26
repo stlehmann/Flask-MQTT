@@ -1,6 +1,7 @@
 import time
 import ssl
-from typing import Tuple
+from flask import Flask
+from typing import Tuple, List, Callable, Any, Dict
 from paho.mqtt.client import Client, MQTT_ERR_SUCCESS, MQTT_ERR_ACL_DENIED, \
     MQTT_ERR_AGAIN, MQTT_ERR_AUTH, MQTT_ERR_CONN_LOST, MQTT_ERR_CONN_REFUSED, \
     MQTT_ERR_ERRNO, MQTT_ERR_INVAL, MQTT_ERR_NO_CONN, MQTT_ERR_NOMEM, \
@@ -15,18 +16,18 @@ __version__ = '0.0.3'
 
 class Mqtt():
 
-    def __init__(self, app=None):
+    def __init__(self, app: Flask=None) -> None:
         self.app = app
         self.client = Client()
         self.client.on_connect = self._handle_connect
         self.client.on_disconnect = self._handle_disconnect
-        self.topics = []
+        self.topics: List = []
         self.connected = False
 
         if app is not None:
             self.init_app(app)
 
-    def init_app(self, app):
+    def init_app(self, app: Flask) -> None:
         self.username = app.config.get('MQTT_USERNAME')
         self.password = app.config.get('MQTT_PASSWORD')
         self.broker_url = app.config.get('MQTT_BROKER_URL', 'localhost')
@@ -45,7 +46,7 @@ class Mqtt():
 
         self._connect()
 
-    def _connect(self):
+    def _connect(self) -> None:
 
         if self.username is not None:
             self.client.username_pw_set(self.username, self.password)
@@ -70,19 +71,20 @@ class Mqtt():
                 keepalive=self.keepalive
         )
 
-    def _disconnect(self):
+    def _disconnect(self) -> None:
         self.client.disconnect()
 
-    def _handle_connect(self, client, userdata, flags, rc):
+    def _handle_connect(self, client: Client, userdata: Any, flags: Dict, 
+                        rc: int) -> None:
         if rc == MQTT_ERR_SUCCESS:
             self.connected = True
             for topic in self.topics:
                 self.client.subscribe(topic)
 
-    def _handle_disconnect(self, client: str, userdata, rc):
+    def _handle_disconnect(self, client: str, userdata: Any, rc: int) -> None:
         self.connected = False
 
-    def on_topic(self, topic: str):
+    def on_topic(self, topic: str) -> Callable:
         """
         Decorator to add a callback function that is called when a certain
         topic has been published. The callback function is expected to have the
@@ -100,12 +102,12 @@ class Mqtt():
                       .format(message.topic, message.payload.decode()))
 
         """
-        def decorator(handler):
+        def decorator(handler: Callable[[str], None]) -> Callable[[str], None]:
             self.client.message_callback_add(topic, handler)
             return handler
         return decorator
 
-    def subscribe(self, topic: str, qos: int=0):
+    def subscribe(self, topic: str, qos: int=0) -> None:
         """
         Subscribe to a certain topic.
 
@@ -135,7 +137,7 @@ class Mqtt():
 
         return result
 
-    def unsubscribe(self, topic: str):
+    def unsubscribe(self, topic: str) -> None:
         """
         Unsubscribe from a single topic.
 
@@ -155,7 +157,7 @@ class Mqtt():
 
         return result
 
-    def unsubscribe_all(self):
+    def unsubscribe_all(self) -> None:
         """
         Unsubscribe from all topics.
 
@@ -190,7 +192,7 @@ class Mqtt():
             self.client.reconnect()
         return self.client.publish(topic, payload, qos, retain)
 
-    def on_message(self):
+    def on_message(self) -> Callable:
         """
         Decorator to handle all messages that have been subscribed.
 
@@ -204,12 +206,12 @@ class Mqtt():
                       .format(message.topic, message.payload.decode()))
 
         """
-        def decorator(handler):
+        def decorator(handler: Callable) -> Callable:
             self.client.on_message = handler
             return handler
         return decorator
 
-    def on_log(self):
+    def on_log(self) -> Callable:
         """
         Decorator to handle MQTT logging.
 
@@ -222,7 +224,7 @@ class Mqtt():
                 print(client, userdata, level, buf)
 
         """
-        def decorator(handler):
+        def decorator(handler: Callable) -> Callable:
             self.client.on_log = handler
             return handler
         return decorator

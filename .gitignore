@@ -90,3 +90,4 @@ ENV/
 *.sublime*
 doc/_build/*
 *.crt
+.mypy_cache/*
