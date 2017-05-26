@@ -59,7 +59,7 @@ class Mqtt():
             )
 
         self.client.loop_start()
-        res = self.client.connect_async(
+        res = self.client.connect(
                 self.broker_url, self.broker_port,
                 keepalive=self.keepalive
         )
