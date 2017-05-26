@@ -85,6 +85,10 @@ ENV/
 # Spyder project settings
 .spyderproject
 
+# Eclipse stuff
+.project
+.pydevproject
+
 # Rope project settings
 .ropeproject
 *.sublime*
