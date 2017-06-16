@@ -92,11 +92,18 @@ class Mqtt():
 
         :parameter topic: a string specifying the subscription topic to subscribe to
 
+        The topic still needs to be subscribed via mqtt.subscribe() before the
+        callback function can be used to handle a certain topic. This way it is
+        possible to subscribe and unsubscribe during runtime.
+
         **Example usage:**
 
         ::
+            app = Flask(__name__)
+            mqtt = Mqtt(app)
+            mqtt.subscribe('home/mytopic')
 
-            @on_topic('home/mytopic')
+            @mqtt.on_topic('home/mytopic')
             def handle_mytopic(client, userdata, message):
                 print('Received message on topic {}: {}'
                       .format(message.topic, message.payload.decode()))
