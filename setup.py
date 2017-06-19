@@ -20,6 +20,7 @@ else:
         platforms='any',
         install_requires=[
             'Flask',
+            'typing',
             'paho-mqtt'
         ],
         classifiers=[
