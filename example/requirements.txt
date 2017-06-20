@@ -6,14 +6,20 @@
 #
 click==6.7                # via flask
 dominate==2.3.1           # via flask-bootstrap
+enum-compat==0.0.2        # via eventlet
+eventlet==0.21.0
 flask-bootstrap==3.3.7.1
+flask-mqtt==0.0.4
 flask-socketio==2.8.6
 flask==0.12.1
+greenlet==0.4.12          # via eventlet
 itsdangerous==0.24        # via flask
 jinja2==2.9.6             # via flask
 markupsafe==1.0           # via jinja2
+paho-mqtt==1.2.3          # via flask-mqtt
 python-engineio==1.3.2    # via flask-socketio, python-socketio
 python-socketio==1.7.4    # via flask-socketio
 six==1.10.0               # via python-engineio, python-socketio
+typing==3.6.1             # via flask-mqtt
 visitor==0.1.3            # via flask-bootstrap
 werkzeug==0.12.1          # via flask
