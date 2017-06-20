@@ -16,6 +16,7 @@ imagesize==0.7.1          # via sphinx
 itsdangerous==0.24
 jinja2==2.9.6
 markupsafe==1.0
+mypy==0.511
 paho-mqtt==1.2.3
 pygments==2.2.0           # via sphinx
 pytz==2017.2              # via babel
@@ -24,6 +25,7 @@ six==1.10.0               # via sphinx
 snowballstemmer==1.2.1    # via sphinx
 sphinx==1.6.2
 sphinxcontrib-websupport==1.0.1  # via sphinx
+typed-ast==1.0.4          # via mypy
 typing==3.6.1
 urllib3==1.21.1           # via requests
 werkzeug==0.12.2

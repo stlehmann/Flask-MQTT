@@ -21,7 +21,7 @@ class Mqtt():
         self.client = Client()
         self.client.on_connect = self._handle_connect
         self.client.on_disconnect = self._handle_disconnect
-        self.topics: List = []
+        self.topics = []  #: type: List
         self.connected = False
 
         if app is not None:
