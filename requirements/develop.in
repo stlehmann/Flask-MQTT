@@ -1,3 +1,2 @@
 -r base.txt
-ptpython
-ipython
+sphinx
