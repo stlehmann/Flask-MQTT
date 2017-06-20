@@ -1,6 +1,10 @@
 Changelog
 =========
 
+Version 0.0.5
+-------------
+* fixed unsupported type annotations for older Python 3 versions
+
 Version 0.0.4
 -------------
 * documentation improvements
