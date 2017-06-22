@@ -91,3 +91,4 @@ ENV/
 doc/_build/*
 *.crt
 .mypy_cache/*
+venv_*/
