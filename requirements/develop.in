@@ -2,3 +2,5 @@
 coverage
 mypy
 sphinx
+tox
+twine
