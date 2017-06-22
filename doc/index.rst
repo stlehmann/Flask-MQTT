@@ -25,7 +25,8 @@ or monitor and control these devices from one or multiple clients.
 
 Support
 =======
-This package uses type annotations so it needs Python 3 and the `typing package <https://pypi.python.org/pypi/typing>`_ installed. Since Python 3.6 the typing package is a builtin package. Python 2 is not supported.
+This package uses type annotations so it needs Python 3.6 or Python 2.7/3.x 
+with the `typing package <https://pypi.python.org/pypi/typing>`_ installed.
 
 Indices and tables
 ==================
