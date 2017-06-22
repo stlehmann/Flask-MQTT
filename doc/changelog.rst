@@ -1,6 +1,10 @@
 Changelog
 =========
 
+Version 0.0.6
+-------------
+* Flask-MQTT now supports Python 2.7
+
 Version 0.0.5
 -------------
 * fixed unsupported type annotations for older Python 3 versions

@@ -11,23 +11,25 @@ from paho.mqtt.client import Client, MQTT_ERR_SUCCESS, MQTT_ERR_ACL_DENIED, \
     MQTT_LOG_WARNING
 
 
-__version__ = '0.0.5'
+__version__ = '0.0.6'
 
 
 class Mqtt():
 
-    def __init__(self, app: Flask=None) -> None:
+    def __init__(self, app):
+        # type: (Flask) -> None
         self.app = app
         self.client = Client()
         self.client.on_connect = self._handle_connect
         self.client.on_disconnect = self._handle_disconnect
-        self.topics = []  #: type: List
+        self.topics = []  # type: List[str]
         self.connected = False
 
         if app is not None:
             self.init_app(app)
 
-    def init_app(self, app: Flask) -> None:
+    def init_app(self, app):
+        # type: (Flask) -> None
         self.username = app.config.get('MQTT_USERNAME')
         self.password = app.config.get('MQTT_PASSWORD')
         self.broker_url = app.config.get('MQTT_BROKER_URL', 'localhost')
@@ -46,7 +48,8 @@ class Mqtt():
 
         self._connect()
 
-    def _connect(self) -> None:
+    def _connect(self):
+        # type: () -> None
 
         if self.username is not None:
             self.client.username_pw_set(self.username, self.password)
@@ -71,20 +74,23 @@ class Mqtt():
                 keepalive=self.keepalive
         )
 
-    def _disconnect(self) -> None:
+    def _disconnect(self):
+        # type: () -> None
         self.client.disconnect()
 
-    def _handle_connect(self, client: Client, userdata: Any, flags: Dict, 
-                        rc: int) -> None:
+    def _handle_connect(self, client, userdata, flags, rc):
+        # type: (Client, Any, Dict, int) -> None
         if rc == MQTT_ERR_SUCCESS:
             self.connected = True
             for topic in self.topics:
                 self.client.subscribe(topic)
 
-    def _handle_disconnect(self, client: str, userdata: Any, rc: int) -> None:
+    def _handle_disconnect(self, client, userdata, rc):
+        # type: (str, Any, int) -> None
         self.connected = False
 
-    def on_topic(self, topic: str) -> Callable:
+    def on_topic(self, topic):
+        # type: (str) -> Callable
         """
         Decorator to add a callback function that is called when a certain
         topic has been published. The callback function is expected to have the
@@ -102,12 +108,14 @@ class Mqtt():
                       .format(message.topic, message.payload.decode()))
 
         """
-        def decorator(handler: Callable[[str], None]) -> Callable[[str], None]:
+        def decorator(handler):
+            # type: (Callable[[str], None]) -> Callable[[str], None]
             self.client.message_callback_add(topic, handler)
             return handler
         return decorator
 
-    def subscribe(self, topic: str, qos: int=0) -> None:
+    def subscribe(self, topic, qos=0):
+        # type: (str, int) -> None
         """
         Subscribe to a certain topic.
 
@@ -137,7 +145,8 @@ class Mqtt():
 
         return result
 
-    def unsubscribe(self, topic: str) -> None:
+    def unsubscribe(self, topic):
+        # type: (str) -> None
         """
         Unsubscribe from a single topic.
 
@@ -157,7 +166,8 @@ class Mqtt():
 
         return result
 
-    def unsubscribe_all(self) -> None:
+    def unsubscribe_all(self):
+        # type: () -> None
         """
         Unsubscribe from all topics.
 
@@ -166,8 +176,8 @@ class Mqtt():
         for topic in topics:
             self.unsubscribe(topic)
 
-    def publish(self, topic: str, payload: bytes=None, qos: int=0,
-                retain: bool=False) -> Tuple[int, int]:
+    def publish(self, topic, payload=None, qos=0, retain=False):
+        # type: (str, bytes, int, bool) -> Tuple[int, int]
         """
         Send a message to the broker.
 
@@ -192,7 +202,8 @@ class Mqtt():
             self.client.reconnect()
         return self.client.publish(topic, payload, qos, retain)
 
-    def on_message(self) -> Callable:
+    def on_message(self):
+        # type: () -> Callable
         """
         Decorator to handle all messages that have been subscribed.
 
@@ -206,12 +217,14 @@ class Mqtt():
                       .format(message.topic, message.payload.decode()))
 
         """
-        def decorator(handler: Callable) -> Callable:
+        def decorator(handler):
+            # type: (Callable) -> Callable
             self.client.on_message = handler
             return handler
         return decorator
 
-    def on_log(self) -> Callable:
+    def on_log(self):
+        # type: () -> Callable
         """
         Decorator to handle MQTT logging.
 
@@ -224,7 +237,8 @@ class Mqtt():
                 print(client, userdata, level, buf)
 
         """
-        def decorator(handler: Callable) -> Callable:
+        def decorator(handler):
+            # type: (Callable) -> Callable
             self.client.on_log = handler
             return handler
         return decorator

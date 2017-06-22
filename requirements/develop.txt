@@ -9,6 +9,7 @@ babel==2.4.0              # via sphinx
 certifi==2017.4.17        # via requests
 chardet==3.0.4            # via requests
 click==6.7
+coverage==4.4.1
 docutils==0.13.1          # via sphinx
 flask==0.12.2
 idna==2.5                 # via requests
