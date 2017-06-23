@@ -15,7 +15,10 @@ python:
 # command to install dependencies
 install:
   - sudo pip install .
+  - pip install coverage
+
 script:
   python setup.py test
+
 after_success:
   coveralls
