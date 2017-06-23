@@ -19,14 +19,22 @@ jinja2==2.9.6
 markupsafe==1.0
 mypy==0.511
 paho-mqtt==1.2.3
+pkginfo==1.4.1            # via twine
+pluggy==0.4.0             # via tox
+py==1.4.34                # via tox
 pygments==2.2.0           # via sphinx
 pytz==2017.2              # via babel
-requests==2.18.1          # via sphinx
+requests-toolbelt==0.8.0  # via twine
+requests==2.18.1          # via requests-toolbelt, sphinx, twine
 six==1.10.0               # via sphinx
 snowballstemmer==1.2.1    # via sphinx
 sphinx==1.6.2
 sphinxcontrib-websupport==1.0.1  # via sphinx
+tox==2.7.0
+tqdm==4.14.0              # via twine
+twine==1.9.1
 typed-ast==1.0.4          # via mypy
 typing==3.6.1
 urllib3==1.21.1           # via requests
+virtualenv==15.1.0        # via tox
 werkzeug==0.12.2
