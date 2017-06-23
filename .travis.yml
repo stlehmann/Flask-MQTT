@@ -1,0 +1,21 @@
+language: python
+sudo: required
+dist: trusty
+
+addons:
+  apt:
+    packages:
+    - git
+    - mosquitto
+   
+python:
+  - "2.7"
+  - "3.5"
+
+# command to install dependencies
+install:
+  - sudo pip install .
+script:
+  python setup.py test
+after_success:
+  coveralls
