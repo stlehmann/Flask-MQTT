@@ -20,6 +20,7 @@ or monitor and control these devices from one or multiple clients.
 
    configuration
    usage
+   testing
    changelog
    api/index
 

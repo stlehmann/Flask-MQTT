@@ -1,6 +1,12 @@
 Changelog
 =========
 
+Version 0.0.7
+-------------
+* 100% test coverage
+* bugfix: make flask application object at initialization optional again
+* proper disconnecting on mqtt._disconnect
+
 Version 0.0.6
 -------------
 * Flask-MQTT now supports Python 2.7
