@@ -14,7 +14,7 @@ python:
 
 # command to install dependencies
 install:
-  - python setup.py
+  - pip install .
   - pip install coverage
 
 script:
