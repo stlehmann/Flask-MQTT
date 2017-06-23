@@ -1,7 +1,11 @@
 import sys
-import ssl
 import unittest
-from unittest.mock import Mock, MagicMock, patch
+
+try:
+    from unittest.mock import MagicMock
+except ImportError:
+    from mock import MagicMock
+
 from flask import Flask
 
 
@@ -11,7 +15,10 @@ try:
     sys.modules.pop('flask_mqtt')
 except KeyError:
     pass
-from flask_mqtt import Mqtt
+
+
+import flask_mqtt
+Mqtt = flask_mqtt.Mqtt
 
 
 class FlaskMQTTTestCase(unittest.TestCase):
@@ -33,13 +40,13 @@ class FlaskMQTTTestCase(unittest.TestCase):
         self.app.config['MQTT_USERNAME'] = 'username'
         self.app.config['MQTT_PASSWORD'] = 'password'
         self.app.config['MQTT_BROKER_URL'] = 'broker_url'
-        self.app.config['MQTT_BROKER_PORT'] = 'broker_port' 
-        self.app.config['MQTT_TLS_ENABLED'] = 'tls_enabled' 
-        self.app.config['MQTT_KEEPALIVE'] = 'keepalive' 
+        self.app.config['MQTT_BROKER_PORT'] = 'broker_port'
+        self.app.config['MQTT_TLS_ENABLED'] = 'tls_enabled'
+        self.app.config['MQTT_KEEPALIVE'] = 'keepalive'
         self.app.config['MQTT_TLS_CA_CERTS'] = 'tls_ca_certs'
         self.app.config['MQTT_TLS_CERTFILE'] = 'tls_certfile'
         self.app.config['MQTT_TLS_KEYFILE'] = 'tls_keyfile'
-        self.app.config['MQTT_TLS_CERT_REQS'] = 'tls_cert_reqs' 
+        self.app.config['MQTT_TLS_CERT_REQS'] = 'tls_cert_reqs'
         self.app.config['MQTT_TLS_VERSION'] = 'tls_version'
         self.app.config['MQTT_TLS_CIPHERS'] = 'tls_ciphers'
         self.app.config['MQTT_TLS_INSECURE'] = 'tls_insecure'
@@ -59,7 +66,6 @@ class FlaskMQTTTestCase(unittest.TestCase):
         self.assertEqual('tls_version', mqtt.tls_version)
         self.assertEqual('tls_ciphers', mqtt.tls_ciphers)
         self.assertEqual('tls_insecure', mqtt.tls_insecure)
-
 
         # values passed to paho mqtt
         mqtt.client.username_pw_set.assert_called_once_with('username',
