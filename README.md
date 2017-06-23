@@ -17,10 +17,6 @@ Find the documentation on [http://flask-mqtt.readthedocs.io][2].
 * use callbacks for certain topics
 * use one callback for all subscribed topics
 
-## Todo
-
-* handle multiple Flask applications
-
 ## Installation
 
 Simply install the package as usual via pip:
