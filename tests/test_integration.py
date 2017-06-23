@@ -1,6 +1,14 @@
+import sys
 import unittest
 import time
 from flask import Flask
+
+# remove mocks and import flask_mqtt
+try:
+    sys.modules.pop('paho.mqtt.client')
+    sys.modules.pop('flask_mqtt')
+except KeyError:
+    pass
 from flask_mqtt import Mqtt
 
 
@@ -53,3 +61,16 @@ class FlaskMQTTTestCase(unittest.TestCase):
         self.mqtt.subscribe('test')
         self.mqtt.publish('test', 'hello world')
         time.sleep(2)
+
+    def test_logging(self):
+        self.mqtt = Mqtt(self.app)
+
+        @self.mqtt.on_log()
+        def handle_logging(client, userdata, level, buf):
+            self.assertIsNotNone(client)
+            self.assertIsNotNone(level)
+            self.assertIsNotNone(buf)
+
+        self.mqtt.publish('test', 'hello world')
+
+

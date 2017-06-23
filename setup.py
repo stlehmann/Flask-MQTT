@@ -6,7 +6,7 @@ from setuptools import setup
 if sys.argv[-1] == 'test':
     os.system('coverage run -m unittest discover -s tests')
     os.system('coverage html --include flask_mqtt/*')
-    os.system('coverage report --include flask_mqtt/*')
+    os.system('coverage report -m --include flask_mqtt/*')
 else:
     setup(
         name='Flask-MQTT',
