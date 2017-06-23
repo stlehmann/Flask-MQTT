@@ -16,7 +16,7 @@ __version__ = '0.0.6'
 
 class Mqtt():
 
-    def __init__(self, app):
+    def __init__(self, app=None):
         # type: (Flask) -> None
         self.app = app
         self.client = Client()
