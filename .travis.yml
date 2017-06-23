@@ -14,7 +14,7 @@ python:
 
 # command to install dependencies
 install:
-  - sudo pip install .
+  - python setup.py
   - pip install coverage
 
 script:
