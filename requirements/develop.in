@@ -1,3 +1,6 @@
 -r base.txt
-ptpython
-ipython
+coverage
+mypy
+sphinx
+tox
+twine

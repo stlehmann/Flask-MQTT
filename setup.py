@@ -6,11 +6,11 @@ from setuptools import setup
 if sys.argv[-1] == 'test':
     os.system('coverage run -m unittest discover -s tests')
     os.system('coverage html --include flask_mqtt/*')
-    os.system('coverage report --include flask_mqtt/*')
+    os.system('coverage report -m --include flask_mqtt/*')
 else:
     setup(
         name='Flask-MQTT',
-        version='0.0.3',
+        version='0.0.7',
         url='https://github.com/MrLeeh/Flask-MQTT',
         license='MIT',
         author='Stefan Lehmann',
@@ -20,10 +20,11 @@ else:
         platforms='any',
         install_requires=[
             'Flask',
+            'typing',
             'paho-mqtt'
         ],
         classifiers=[
-            'Development Status :: 3 - Alpha',
+            'Development Status :: 4 - Beta',
             'Environment :: Web Environment',
             'Intended Audience :: Developers',
             'License :: OSI Approved :: MIT License',

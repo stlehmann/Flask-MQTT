@@ -19,7 +19,7 @@ Find the documentation on [http://flask-mqtt.readthedocs.io][2].
 
 ## Todo
 
-* auto-reconnect after broker went down
+* handle multiple Flask applications
 
 ## Installation
 

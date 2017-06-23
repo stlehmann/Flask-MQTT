@@ -20,13 +20,14 @@ or monitor and control these devices from one or multiple clients.
 
    configuration
    usage
+   testing
    changelog
    api/index
 
 Support
 =======
-This package uses type annotations so you need at least Python 3.5 to use it.
-Python 2 is not supported.
+This package uses type annotations so it needs Python 3.6 or Python 2.7/3.x 
+with the `typing package <https://pypi.python.org/pypi/typing>`_ installed.
 
 Indices and tables
 ==================
