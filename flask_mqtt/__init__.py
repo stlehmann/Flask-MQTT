@@ -76,6 +76,7 @@ class Mqtt():
 
     def _disconnect(self):
         # type: () -> None
+        self.client.loop_stop()
         self.client.disconnect()
 
     def _handle_connect(self, client, userdata, flags, rc):
