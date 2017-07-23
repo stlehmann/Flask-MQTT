@@ -11,7 +11,7 @@ from paho.mqtt.client import Client, MQTT_ERR_SUCCESS, MQTT_ERR_ACL_DENIED, \
     MQTT_LOG_WARNING
 
 
-__version__ = '0.0.7'
+__version__ = '0.0.8'
 
 
 class Mqtt():
