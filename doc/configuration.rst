@@ -73,4 +73,23 @@ Configuration Keys
                                Do not use this function in a real system.
                                Setting value to True means there is no
                                point using encryption.
+
+``MQTT_LAST_WILL_TOPIC``       The topic that the will message should be 
+                               published on. If not set no will message will
+                               be sent on disconnecting the client.
+
+``MQTT_LAST_WILL_MESSAGE``     The message to send as a will. If not given, or
+                               set to None a zero length message will be used
+                               as the will. Passing an int or float will result
+                               in the payload being converted to a string
+                               representing that number. If you wish to send
+                               a true int/float, use struct.pack() to
+                               create the payload you require.
+
+``MQTT_LAST_WILL_QOS``         The quality of service level to use for the will.
+                               Defaults to 0.
+
+``MQTT_LAST_WILL_RETAIN``      If set to true, the will message will be set
+                               as the "last known good"/retained message for
+                               the topic. Defaults to False.
 ============================== ================================================

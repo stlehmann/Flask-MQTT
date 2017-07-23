@@ -36,6 +36,10 @@ class Mqtt():
         self.broker_port = app.config.get('MQTT_BROKER_PORT', 1883)
         self.tls_enabled = app.config.get('MQTT_TLS_ENABLED', False)
         self.keepalive = app.config.get('MQTT_KEEPALIVE', 60)
+        self.last_will_topic = app.config.get('MQTT_LAST_WILL_TOPIC')
+        self.last_will_message = app.config.get('MQTT_LAST_WILL_MESSAGE')
+        self.last_will_qos = app.config.get('MQTT_LAST_WILL_QOS', 0)
+        self.last_will_retain = app.config.get('MQTT_LAST_WILL_RETAIN', False)
 
         if self.tls_enabled:
             self.tls_ca_certs = app.config['MQTT_TLS_CA_CERTS']
@@ -46,6 +50,10 @@ class Mqtt():
             self.tls_ciphers = app.config.get('MQTT_TLS_CIPHERS')
             self.tls_insecure = app.config.get('MQTT_TLS_INSECURE', False)
 
+        # set last will message
+        if self.last_will_topic is not None:
+            self.client.will_set(self.last_will_topic, self.last_will_message,
+                                 self.last_will_qos, self.last_will_retain)
         self._connect()
 
     def _connect(self):
