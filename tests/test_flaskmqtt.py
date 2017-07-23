@@ -43,6 +43,10 @@ class FlaskMQTTTestCase(unittest.TestCase):
         self.app.config['MQTT_BROKER_PORT'] = 'broker_port'
         self.app.config['MQTT_TLS_ENABLED'] = 'tls_enabled'
         self.app.config['MQTT_KEEPALIVE'] = 'keepalive'
+        self.app.config['MQTT_LAST_WILL_TOPIC'] = 'home/lastwill'
+        self.app.config['MQTT_LAST_WILL_MESSAGE'] = 'last will'
+        self.app.config['MQTT_LAST_WILL_QOS'] = 2
+        self.app.config['MQTT_LAST_WILL_RETAIN'] = True
         self.app.config['MQTT_TLS_CA_CERTS'] = 'tls_ca_certs'
         self.app.config['MQTT_TLS_CERTFILE'] = 'tls_certfile'
         self.app.config['MQTT_TLS_KEYFILE'] = 'tls_keyfile'
@@ -59,6 +63,10 @@ class FlaskMQTTTestCase(unittest.TestCase):
         self.assertEqual('broker_port', mqtt.broker_port)
         self.assertEqual('tls_enabled', mqtt.tls_enabled)
         self.assertEqual('keepalive', mqtt.keepalive)
+        self.assertEqual('home/lastwill', mqtt.last_will_topic)
+        self.assertEqual('last will', mqtt.last_will_message)
+        self.assertEqual(2, mqtt.last_will_qos)
+        self.assertEqual(True, mqtt.last_will_retain)
         self.assertEqual('tls_ca_certs', mqtt.tls_ca_certs)
         self.assertEqual('tls_certfile', mqtt.tls_certfile)
         self.assertEqual('tls_keyfile', mqtt.tls_keyfile)

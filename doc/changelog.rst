@@ -1,6 +1,11 @@
 Changelog
 =========
 
+Version 0.0.8
+-------------
+* add last will to be published on client disconnect
+* add `on_publish`, `on_subscribe` and `on_unsubscribe` decorator
+
 Version 0.0.7
 -------------
 * 100% test coverage

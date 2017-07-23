@@ -111,9 +111,8 @@ class Mqtt():
         callback function can be used to handle a certain topic. This way it is
         possible to subscribe and unsubscribe during runtime.
 
-        **Example usage:**
+        **Example usage:**::
 
-        ::
             app = Flask(__name__)
             mqtt = Mqtt(app)
             mqtt.subscribe('home/mytopic')
@@ -131,7 +130,7 @@ class Mqtt():
         return decorator
 
     def subscribe(self, topic, qos=0):
-        # type: (str, int) -> None
+        # type: (str, int) -> tuple(int, int) 
         """
         Subscribe to a certain topic.
 
@@ -139,35 +138,53 @@ class Mqtt():
         :param qos: the desired quality of service level for the subscription.
                     Defaults to 0.
 
+        :rtype: (int, int)
+        :result: (result, mid)
+
         A topic is a UTF-8 string, which is used by the broker to filter
         messages for each connected client. A topic consists of one or more
         topic levels. Each topic level is separated by a forward slash
         (topic level separator).
+
+        The function returns a tuple (result, mid), where result is
+        MQTT_ERR_SUCCESS to indicate success or (MQTT_ERR_NO_CONN, None) if the
+        client is not currently connected.  mid is the message ID for the
+        subscribe request. The mid value can be used to track the subscribe
+        request by checking against the mid argument in the on_subscribe()
+        callback if it is defined.
 
         **Topic example:** `myhome/groundfloor/livingroom/temperature`
 
         """
         # TODO: add support for list of topics
         # don't subscribe if already subscribed
-        if topic in self.topics:
-            return
-
         # try to subscribe
         result, mid = self.client.subscribe(topic, qos)
 
         # if successful add to topics
         if result == MQTT_ERR_SUCCESS:
-            self.topics.append(topic)
+            if topic not in self.topics:
+                self.topics.append(topic)
 
-        return result
+        return (result, mid)
 
     def unsubscribe(self, topic):
-        # type: (str) -> None
+        # type: (str) -> tuple(int, int) 
         """
         Unsubscribe from a single topic.
 
         :param topic: a single string that is the subscription topic to
                       unsubscribe from
+
+        :rtype: (int, int)
+        :result: (result, mid) 
+
+        Returns a tuple (result, mid), where result is MQTT_ERR_SUCCESS
+        to indicate success or (MQTT_ERR_NO_CONN, None) if the client is not
+        currently connected.
+        mid is the message ID for the unsubscribe request. The mid value can be
+        used to track the unsubscribe request by checking against the mid
+        argument in the on_unsubscribe() callback if it is defined.
 
         """
         # don't unsubscribe if not in topics
@@ -180,7 +197,7 @@ class Mqtt():
         if result == MQTT_ERR_SUCCESS:
             self.topics.remove(topic)
 
-        return result
+        return result, mid
 
     def unsubscribe_all(self):
         # type: () -> None
@@ -221,11 +238,14 @@ class Mqtt():
     def on_message(self):
         # type: () -> Callable
         """
-        Decorator to handle all messages that have been subscribed.
+        Decorator to handle all messages that have been subscribed and that
+        are not handled via the `on_message` decorator.
 
-        **Example Usage:**
+        **Note:** Unlike as written in the paho mqtt documentation this 
+        callback will not be called if there exists an topic-specific callback
+        added by the `on_topic` decorator.
 
-        ::
+        **Example Usage:**::
 
             @mqtt.on_message()
             def handle_messages(client, userdata, message):
@@ -238,6 +258,61 @@ class Mqtt():
             self.client.on_message = handler
             return handler
         return decorator
+
+    def on_publish(self):
+        """
+        Decorator to handle all messages that have been published by the
+        client.
+
+        **Example Usage:**::
+
+            @mqtt.on_publish()
+            def handle_publish(client, userdata, mid):
+                print('Published message with mid {}.'
+                      .format(mid))
+        """
+
+        def decorator(handler):
+            self.client.on_publish = handler
+            return handler
+        return decorator
+
+    def on_subscribe(self):
+        """
+        Decorator to handle subscribe callbacks.
+
+        **Usage:**::
+
+            @mqtt.on_subscribe()
+            def handle_subscribe(client, userdata, mid, granted_qos):
+                print('Subscription id {} granted with qos {}.'
+                      .format(mid, granted_qos))
+
+        """
+
+        def decorator(handler):
+            self.client.on_subscribe = handler
+            return handler
+        return decorator
+
+
+    def on_unsubscribe(self):
+        """
+        Decorator to handle unsubscribe callbacks.
+
+        **Usage:**::
+
+            @mqtt.unsubscribe()
+            def handle_unsubscribe(client, userdata, mid)
+                print('Unsubscribed from topic (id: {})'
+                      .format(mid)')
+                
+        """
+        def decorator(handler):
+            self.client.on_unsubscribe = handler
+            return handler
+        return decorator
+
 
     def on_log(self):
         # type: () -> Callable
