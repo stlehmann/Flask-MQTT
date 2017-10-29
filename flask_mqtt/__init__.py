@@ -1,7 +1,4 @@
-import time
 import ssl
-from flask import Flask
-from typing import Tuple, List, Callable, Any, Dict
 from paho.mqtt.client import Client, MQTT_ERR_SUCCESS, MQTT_ERR_ACL_DENIED, \
     MQTT_ERR_AGAIN, MQTT_ERR_AUTH, MQTT_ERR_CONN_LOST, MQTT_ERR_CONN_REFUSED, \
     MQTT_ERR_ERRNO, MQTT_ERR_INVAL, MQTT_ERR_NO_CONN, MQTT_ERR_NOMEM, \
@@ -11,7 +8,7 @@ from paho.mqtt.client import Client, MQTT_ERR_SUCCESS, MQTT_ERR_ACL_DENIED, \
     MQTT_LOG_WARNING
 
 
-__version__ = '0.0.8'
+__version__ = '0.0.9'
 
 
 class Mqtt():
@@ -45,8 +42,10 @@ class Mqtt():
             self.tls_ca_certs = app.config['MQTT_TLS_CA_CERTS']
             self.tls_certfile = app.config.get('MQTT_TLS_CERTFILE')
             self.tls_keyfile = app.config.get('MQTT_TLS_KEYFILE')
-            self.tls_cert_reqs = app.config.get('MQTT_TLS_CERT_REQS', ssl.CERT_REQUIRED)
-            self.tls_version = app.config.get('MQTT_TLS_VERSION', ssl.PROTOCOL_TLSv1)
+            self.tls_cert_reqs = app.config.get('MQTT_TLS_CERT_REQS',
+                                                ssl.CERT_REQUIRED)
+            self.tls_version = app.config.get('MQTT_TLS_VERSION',
+                                              ssl.PROTOCOL_TLSv1)
             self.tls_ciphers = app.config.get('MQTT_TLS_CIPHERS')
             self.tls_insecure = app.config.get('MQTT_TLS_INSECURE', False)
 
@@ -77,10 +76,8 @@ class Mqtt():
             )
 
         self.client.loop_start()
-        res = self.client.connect(
-                self.broker_url, self.broker_port,
-                keepalive=self.keepalive
-        )
+        self.client.connect(self.broker_url, self.broker_port,
+                            keepalive=self.keepalive)
 
     def _disconnect(self):
         # type: () -> None
@@ -105,7 +102,8 @@ class Mqtt():
         topic has been published. The callback function is expected to have the
         following form: `handle_topic(client, userdata, message)`
 
-        :parameter topic: a string specifying the subscription topic to subscribe to
+        :parameter topic: a string specifying the subscription topic to
+            subscribe to
 
         The topic still needs to be subscribed via mqtt.subscribe() before the
         callback function can be used to handle a certain topic. This way it is
@@ -130,11 +128,12 @@ class Mqtt():
         return decorator
 
     def subscribe(self, topic, qos=0):
-        # type: (str, int) -> tuple(int, int) 
+        # type: (str, int) -> tuple(int, int)
         """
         Subscribe to a certain topic.
 
-        :param topic: a string specifying the subscription topic to subscribe to.
+        :param topic: a string specifying the subscription topic to
+            subscribe to.
         :param qos: the desired quality of service level for the subscription.
                     Defaults to 0.
 
@@ -169,7 +168,7 @@ class Mqtt():
         return (result, mid)
 
     def unsubscribe(self, topic):
-        # type: (str) -> tuple(int, int) 
+        # type: (str) -> tuple(int, int)
         """
         Unsubscribe from a single topic.
 
@@ -177,7 +176,7 @@ class Mqtt():
                       unsubscribe from
 
         :rtype: (int, int)
-        :result: (result, mid) 
+        :result: (result, mid)
 
         Returns a tuple (result, mid), where result is MQTT_ERR_SUCCESS
         to indicate success or (MQTT_ERR_NO_CONN, None) if the client is not
@@ -241,7 +240,7 @@ class Mqtt():
         Decorator to handle all messages that have been subscribed and that
         are not handled via the `on_message` decorator.
 
-        **Note:** Unlike as written in the paho mqtt documentation this 
+        **Note:** Unlike as written in the paho mqtt documentation this
         callback will not be called if there exists an topic-specific callback
         added by the `on_topic` decorator.
 
@@ -295,7 +294,6 @@ class Mqtt():
             return handler
         return decorator
 
-
     def on_unsubscribe(self):
         """
         Decorator to handle unsubscribe callbacks.
@@ -306,13 +304,12 @@ class Mqtt():
             def handle_unsubscribe(client, userdata, mid)
                 print('Unsubscribed from topic (id: {})'
                       .format(mid)')
-                
+
         """
         def decorator(handler):
             self.client.on_unsubscribe = handler
             return handler
         return decorator
-
 
     def on_log(self):
         # type: () -> Callable
@@ -322,7 +319,7 @@ class Mqtt():
         **Example Usage:**
 
         ::
-            
+
             @mqtt.on_log()
             def handle_logging(client, userdata, level, buf):
                 print(client, userdata, level, buf)
@@ -333,4 +330,3 @@ class Mqtt():
             self.client.on_log = handler
             return handler
         return decorator
-
