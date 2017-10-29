@@ -1,5 +1,0 @@
-eventlet
-flask
-flask-socketio
-flask-bootstrap
-flask-mqtt
