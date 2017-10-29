@@ -1,0 +1,18 @@
+[[source]]
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+
+flask = "*"
+"paho-mqtt" = "*"
+
+
+[dev-packages]
+
+mypy = "*"
+sphinx = "*"
+tox = "*"
+twine = "*"
+coverage = "*"

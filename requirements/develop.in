@@ -1,6 +1,0 @@
--r base.txt
-coverage
-mypy
-sphinx
-tox
-twine
