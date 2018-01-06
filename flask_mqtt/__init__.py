@@ -16,6 +16,9 @@ class Mqtt():
     def __init__(self, app=None):
         # type: (Flask) -> None
         self.app = app
+        self._connect_handler = None
+        self._disconnect_handler = None
+
         self.client = Client()
         self.client.on_connect = self._handle_connect
         self.client.on_disconnect = self._handle_disconnect
@@ -90,10 +93,14 @@ class Mqtt():
             self.connected = True
             for topic in self.topics:
                 self.client.subscribe(topic)
+        if self._connect_handler is not None:
+            self._connect_handler(client, userdata, flags, rc)
 
     def _handle_disconnect(self, client, userdata, rc):
         # type: (str, Any, int) -> None
         self.connected = False
+        if self._disconnect_handler is not None:
+            self._disconnect_handler()
 
     def on_topic(self, topic):
         # type: (str) -> Callable
@@ -233,6 +240,27 @@ class Mqtt():
         if not self.connected:
             self.client.reconnect()
         return self.client.publish(topic, payload, qos, retain)
+
+    def on_connect(self):
+        """
+        Decorator to handle the event when the broker responds to a connection
+        request. Only the last decorated function will be called.
+
+        """
+        def decorator(handler):
+            self._connect_handler = handler
+            return handler
+        return decorator
+
+    def on_disconnect(self):
+        """
+        Decorator to handle the event when client disconnects from broker. Only
+        the last decorated function will be called.
+        """
+        def decorator(handler):
+            self._disconnect_handler = handler
+            return handler
+        return decorator
 
     def on_message(self):
         # type: () -> Callable
