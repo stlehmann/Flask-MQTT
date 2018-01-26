@@ -45,20 +45,21 @@ def index():
 @socketio.on('publish')
 def handle_publish(json_str):
     data = json.loads(json_str)
-    mqtt.publish(data['topic'], data['message'])
+    mqtt.publish(data['topic'], data['message'], data['qos'])
 
 
 @socketio.on('subscribe')
 def handle_subscribe(json_str):
     data = json.loads(json_str)
-    mqtt.subscribe(data['topic'])
+    mqtt.subscribe(data['topic'], data['qos'])
 
 
 @mqtt.on_message()
 def handle_mqtt_message(client, userdata, message):
     data = dict(
         topic=message.topic,
-        payload=message.payload.decode()
+        payload=message.payload.decode(),
+        qos=message.qos,
     )
     socketio.emit('mqtt_message', data=data)
 
