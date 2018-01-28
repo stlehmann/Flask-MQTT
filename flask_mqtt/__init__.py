@@ -1,4 +1,6 @@
 import ssl
+from collections import namedtuple
+from collections import MutableSequence
 from paho.mqtt.client import Client, MQTT_ERR_SUCCESS, MQTT_ERR_ACL_DENIED, \
     MQTT_ERR_AGAIN, MQTT_ERR_AUTH, MQTT_ERR_CONN_LOST, MQTT_ERR_CONN_REFUSED, \
     MQTT_ERR_ERRNO, MQTT_ERR_INVAL, MQTT_ERR_NO_CONN, MQTT_ERR_NOMEM, \
@@ -9,6 +11,59 @@ from paho.mqtt.client import Client, MQTT_ERR_SUCCESS, MQTT_ERR_ACL_DENIED, \
 
 
 __version__ = '0.0.10'
+
+TopicQos = namedtuple('TopicQos', ['topic', 'qos'])
+
+
+class TopicQosList(MutableSequence):
+
+    def __init__(self):
+        self.topic_qos = []
+
+    def __setitem__(self, index, value):
+        if isinstance(value, TopicQos):
+            self.topic_qos.insert(index, value)
+        else:
+            raise TypeError('value type error')
+
+    def insert(self, index, value):
+        if isinstance(value, TopicQos):
+            self.topic_qos.insert(index, value)
+        else:
+            raise TypeError('value type error')
+
+    def __delitem__(self, index):
+        del self.topic_qos[index]
+
+    def __len__(self):
+        return len(self.topic_qos)
+
+    def __getitem__(self, index):
+        return self.topic_qos[index]
+
+    def __repr__(self):
+        return str(self.topic_qos)
+
+    def __contains__(self, item):
+        if isinstance(item, TopicQos):
+            return item in self.topic_qos
+        elif isinstance(item, str):
+            for topic, _ in self.topic_qos:
+                if topic == topic:
+                    return True
+            return False
+        else:
+            return False
+
+    def index(self, value, **kwargs):
+        for i, v in enumerate(self):
+            if isinstance(value, TopicQos):
+                if v == value:
+                    return i
+            if isinstance(value, str):
+                if v.topic == value:
+                    return i
+        raise ValueError
 
 
 class Mqtt():
@@ -22,7 +77,7 @@ class Mqtt():
         self.client = Client()
         self.client.on_connect = self._handle_connect
         self.client.on_disconnect = self._handle_disconnect
-        self.topics = []  # type: List[str]
+        self.topics = TopicQosList()
         self.connected = False
 
         if app is not None:
@@ -91,8 +146,8 @@ class Mqtt():
         # type: (Client, Any, Dict, int) -> None
         if rc == MQTT_ERR_SUCCESS:
             self.connected = True
-            for topic in self.topics:
-                self.client.subscribe(topic)
+            for topic, qos in self.topics:
+                self.client.subscribe(topic=topic, qos=qos)
         if self._connect_handler is not None:
             self._connect_handler(client, userdata, flags, rc)
 
@@ -165,13 +220,12 @@ class Mqtt():
         # TODO: add support for list of topics
         # don't subscribe if already subscribed
         # try to subscribe
-        result, mid = self.client.subscribe(topic, qos)
+        result, mid = self.client.subscribe(topic=topic, qos=qos)
 
         # if successful add to topics
         if result == MQTT_ERR_SUCCESS:
-            if topic not in self.topics:
-                self.topics.append(topic)
-
+            if (topic, qos) not in self.topics:
+                self.topics.append(TopicQos(topic=topic, qos=qos))
         return (result, mid)
 
     def unsubscribe(self, topic):
