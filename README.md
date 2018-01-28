@@ -49,10 +49,14 @@ def index():
 
 ### Subscribe to a topic
 
-To subscribe to a topic simply use `mqtt.subscribe()`.
+To subscribe to a topic simply use `mqtt.subscribe()`. To make sure the
+subscription gets handled correctly on startup place the subscription inside
+an `on_connect()` callback function.
 
 ```python
-mqtt.subscribe('home/mytopic')
+@mqtt.on_connect()
+def handle_connect(client, userdata, flags, rc):
+    mqtt.subscribe('home/mytopic')
 ```
 
 To handle the subscribed messages you can define a handling function by
