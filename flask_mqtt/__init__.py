@@ -1,4 +1,5 @@
 import ssl
+from collections import namedtuple
 from paho.mqtt.client import Client, MQTT_ERR_SUCCESS, MQTT_ERR_ACL_DENIED, \
     MQTT_ERR_AGAIN, MQTT_ERR_AUTH, MQTT_ERR_CONN_LOST, MQTT_ERR_CONN_REFUSED, \
     MQTT_ERR_ERRNO, MQTT_ERR_INVAL, MQTT_ERR_NO_CONN, MQTT_ERR_NOMEM, \
@@ -9,6 +10,9 @@ from paho.mqtt.client import Client, MQTT_ERR_SUCCESS, MQTT_ERR_ACL_DENIED, \
 
 
 __version__ = '0.0.10'
+
+
+TopicQos = namedtuple('TopicQos', ['topic', 'qos'])
 
 
 class Mqtt():
@@ -22,7 +26,7 @@ class Mqtt():
         self.client = Client()
         self.client.on_connect = self._handle_connect
         self.client.on_disconnect = self._handle_disconnect
-        self.topics = []  # type: List[str]
+        self.topics = {}  # type: List[TopicQos]
         self.connected = False
 
         if app is not None:
@@ -91,8 +95,8 @@ class Mqtt():
         # type: (Client, Any, Dict, int) -> None
         if rc == MQTT_ERR_SUCCESS:
             self.connected = True
-            for topic in self.topics:
-                self.client.subscribe(topic)
+            for key, item in self.topics.items():
+                self.client.subscribe(topic=item.topic, qos=item.qos)
         if self._connect_handler is not None:
             self._connect_handler(client, userdata, flags, rc)
 
@@ -163,14 +167,14 @@ class Mqtt():
 
         """
         # TODO: add support for list of topics
+
         # don't subscribe if already subscribed
         # try to subscribe
-        result, mid = self.client.subscribe(topic, qos)
+        result, mid = self.client.subscribe(topic=topic, qos=qos)
 
         # if successful add to topics
         if result == MQTT_ERR_SUCCESS:
-            if topic not in self.topics:
-                self.topics.append(topic)
+            self.topics[topic] = TopicQos(topic=topic, qos=qos)
 
         return (result, mid)
 
@@ -194,16 +198,14 @@ class Mqtt():
 
         """
         # don't unsubscribe if not in topics
-        if topic not in self.topics:
-            return
+        if topic in self.topics:
+            result, mid = self.client.unsubscribe(topic)
 
-        result, mid = self.client.unsubscribe(topic)
+            if result == MQTT_ERR_SUCCESS:
+                self.topics.pop(topic)
 
-        # if successful remove from topics
-        if result == MQTT_ERR_SUCCESS:
-            self.topics.remove(topic)
-
-        return result, mid
+            # if successful remove from topics
+            return result, mid
 
     def unsubscribe_all(self):
         # type: () -> None
@@ -211,7 +213,7 @@ class Mqtt():
         Unsubscribe from all topics.
 
         """
-        topics = self.topics[:]
+        topics = list(self.topics.keys())
         for topic in topics:
             self.unsubscribe(topic)
 

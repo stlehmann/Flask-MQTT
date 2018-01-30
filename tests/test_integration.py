@@ -2,7 +2,7 @@ import sys
 import unittest
 import time
 from flask import Flask
-from queue import Queue
+
 
 # remove mocks and import flask_mqtt
 try:
@@ -56,6 +56,23 @@ class FlaskMQTTTestCase(unittest.TestCase):
 
         self.assertTrue(self.subscribe_handled)
         self.assertTrue(self.unsubscribe_handled)
+
+    def test_qos(self):
+        self.mqtt = Mqtt(self.app)
+
+        # subscribe to a topic with qos = 1
+        self.mqtt.subscribe('test', 1)
+        self.assertEqual(1, len(self.mqtt.topics))
+        self.assertEqual(('test', 1), self.mqtt.topics['test'])
+
+        # subscribe to same topic, overwrite qos
+        self.mqtt.subscribe('test', 2)
+        self.assertEqual(1, len(self.mqtt.topics))
+        self.assertEqual(('test', 2), self.mqtt.topics['test'])
+
+        # unsubscribe
+        self.mqtt.unsubscribe('test')
+        self.assertEqual(0, len(self.mqtt.topics))
 
     def test_topic_count(self):
         self.mqtt = Mqtt(self.app)
