@@ -22,9 +22,6 @@ class Mqtt():
         self.app = app
         self._connect_handler = None
         self._disconnect_handler = None
-        self.client = Client(app.config.get('MQTT_CLIENT_ID')) if app.config.get('MQTT_CLIENT_ID') else Client()
-        self.client.on_connect = self._handle_connect
-        self.client.on_disconnect = self._handle_disconnect
         self.topics = {}  # type: List[TopicQos]
         self.connected = False
 
@@ -33,10 +30,17 @@ class Mqtt():
 
     def init_app(self, app):
         # type: (Flask) -> None
+
+        self.client = Client(
+            client_id=app.config.get('MQTT_CLIENT_ID', ''),
+            transport=app.config.get('MQTT_TRANSPORT', 'tcp'),
+        )
+
+        self.client.on_connect = self._handle_connect
+        self.client.on_disconnect = self._handle_disconnect
         self.username = app.config.get('MQTT_USERNAME')
         self.password = app.config.get('MQTT_PASSWORD')
         self.broker_url = app.config.get('MQTT_BROKER_URL', 'localhost')
-        self.transport = app.config.get('MQTT_BROKER_TRANSPORT', 'tcp')
         self.broker_port = app.config.get('MQTT_BROKER_PORT', 1883)
         self.tls_enabled = app.config.get('MQTT_TLS_ENABLED', False)
         self.keepalive = app.config.get('MQTT_KEEPALIVE', 60)
@@ -81,7 +85,6 @@ class Mqtt():
                 tls_version=self.tls_version,
                 ciphers=self.tls_ciphers,
             )
-
         self.client.loop_start()
         self.client.connect(self.broker_url, self.broker_port,
                             keepalive=self.keepalive)
