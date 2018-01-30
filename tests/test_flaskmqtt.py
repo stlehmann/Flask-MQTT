@@ -17,7 +17,7 @@ except KeyError:
     pass
 
 
-import flask_mqtt
+import flask_mqtt  # noqa: E402
 Mqtt = flask_mqtt.Mqtt
 
 
