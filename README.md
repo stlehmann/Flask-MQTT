@@ -5,7 +5,7 @@ around [paho-mqtt][0] and aimes to simplify MQTT integration in Flask. MQTT is a
 machine-to-machine "Internet of Things" protocol and was designed for extremely
 lightweight publish/subscribe messaging transport.
 
-[![Documentation Status](https://readthedocs.org/projects/flask-mqtt/badge/?version=latest)](http://flask-mqtt.readthedocs.io/en/latest/?badge=latest) [![PyPI version](https://badge.fury.io/py/Flask-MQTT.svg)](https://badge.fury.io/py/Flask-MQTT) [![Travis CI](https://travis-ci.org/MrLeeh/Flask-MQTT.svg?branch=master)](https://travis-ci.org/MrLeeh/Flask-MQTT.svg?branch=master)
+[![Documentation Status](https://readthedocs.org/projects/flask-mqtt/badge/?version=latest)](http://flask-mqtt.readthedocs.io/en/latest/?badge=latest) [![PyPI version](https://badge.fury.io/py/Flask-MQTT.svg)](https://badge.fury.io/py/Flask-MQTT) [![Travis CI](https://travis-ci.org/stlehmann/Flask-MQTT.svg?branch=master)](https://travis-ci.org/stlehmann/Flask-MQTT.svg?branch=master)
 
 Find the documentation on [http://flask-mqtt.readthedocs.io][2].
 
@@ -49,10 +49,14 @@ def index():
 
 ### Subscribe to a topic
 
-To subscribe to a topic simply use `mqtt.subscribe()`.
+To subscribe to a topic simply use `mqtt.subscribe()`. To make sure the
+subscription gets handled correctly on startup place the subscription inside
+an `on_connect()` callback function.
 
 ```python
-mqtt.subscribe('home/mytopic')
+@mqtt.on_connect()
+def handle_connect(client, userdata, flags, rc):
+    mqtt.subscribe('home/mytopic')
 ```
 
 To handle the subscribed messages you can define a handling function by

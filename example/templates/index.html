@@ -13,15 +13,17 @@
     var socket = io.connect('http://' + document.domain + ':' + location.port);
 
     $('#publish').click(function(event) {
-      var topic = $('#topic').val()
-      var message = $('#message').val()
-      var data = '{"topic": "' + topic + '", "message": "' + message + '"}';
+      var topic = $('#topic').val();
+      var message = $('#message').val();
+      var qos = $('#qos').val();
+      var data = '{"topic": "' + topic + '", "message": "' + message + '", "qos": ' + qos + '}';
       socket.emit('publish', data=data);
     });
 
     $('#subscribe').click(function(event) {
-      var topic = $('#subscribe_topic').val()
-      var data = '{"topic": "' + topic + '"}'
+      var topic = $('#subscribe_topic').val();
+      var qos = $('#subscribe_qos').val();
+      var data = '{"topic": "' + topic + '", "qos": ' + qos + '}';
       socket.emit('subscribe', data=data);
       $('#subscribe').hide();
       $('#unsubscribe').show();
@@ -37,7 +39,7 @@
 
     socket.on('mqtt_message', function(data) {
       console.log(data);
-      var text = '(' + data['topic'] + ') ' + data['payload'];
+      var text = '(' + data['topic'] + ' qos: ' + data['qos'] + ') ' + data['payload'];
       var $textarea = $('#subscribe_messages');
       $textarea.val($textarea.val() + text + '\n');
     })
@@ -75,6 +77,16 @@
                   </div>
                 </div>
                 <div class="form-group">
+                  <label class="control-label col-xs-4">Qos: </label>
+                  <div class="col-xs-8">
+                    <select id="qos" class="form-control">
+                      <option value=0>0</option>
+                      <option value=1>1</option>
+                      <option value=2>2</option>
+                    </select>
+                  </div> 
+                </div>
+                <div class="form-group">
                   <div class="col-xs-8 col-xs-offset-4">
                     <button id="publish" class="btn btn-primary">Publish</button>
                   </div>
@@ -99,6 +111,16 @@
                   <div class="col-xs-8">
                     <input id="subscribe_topic" class="form-control">
                   </div>
+                </div>
+                <div class="form-group">
+                  <label class="control-label col-xs-4">Qos: </label>
+                  <div class="col-xs-8">
+                    <select id="subscribe_qos" class="form-control">
+                      <option value=0>0</option>
+                      <option value=1>1</option>
+                      <option value=2>2</option>
+                    </select>
+                  </div> 
                 </div>
                 <div class="form-group">
                   <div class="col-xs-8 col-xs-offset-4">

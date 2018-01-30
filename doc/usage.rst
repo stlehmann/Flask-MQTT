@@ -32,7 +32,7 @@ the factory function for initialization.
 
 Configure the MQTT client
 -------------------------
-The configuration of the MQTT client is done via configuration variables as 
+The configuration of the MQTT client is done via configuration variables as
 it is common for Flask extension.
 
 ::
@@ -61,6 +61,16 @@ To subscribe to a topic simply use :py:func:`flask_mqtt.Mqtt.subscribe`.
 ::
 
     mqtt.subscribe('home/mytopic')
+
+If you want to subscribe to a topic right from the start make sure to wait with
+the subscription until the client is connected to the broker. Use the
+:py:func:`flask_mqtt.Mqtt.on_connect` decorator for this.
+
+::
+
+    @mqtt.on_connect()
+    def handle_connect(client, userdata, flags, rc):
+        mqtt.subscribe('home/mytopic')
 
 To handle the subscribed messages you can define a handling function by
 using the :py:func:`flask_mqtt.Mqtt.on_message` decorator.
@@ -136,7 +146,7 @@ messages and publish messages.
 
 
 ::
-    
+
     """
 
     A small Test application to show how to use Flask-MQTT.

@@ -117,14 +117,16 @@ class FlaskMQTTTestCase(unittest.TestCase):
         def handle_on_topic(*args, **kwargs):
             self.handled_topic = True
 
-        self.mqtt.subscribe('home/test')
+        @self.mqtt.on_connect()
+        def handle_connect(*args, **kwargs):
+            self.mqtt.subscribe('home/test')
+
         wait()
         self.mqtt.publish('home/test', 'hello world')
         wait()
 
         self.assertFalse(self.handled_message)
         self.assertTrue(self.handled_topic)
-
 
     def test_logging(self):
         self.mqtt = Mqtt(self.app)
@@ -137,5 +139,26 @@ class FlaskMQTTTestCase(unittest.TestCase):
 
         self.mqtt.publish('test', 'hello world')
 
+    def test_disconnect(self):
+        self.mqtt = Mqtt()
+        self.connected = False
+
+        @self.mqtt.on_connect()
+        def handle_connect(*args, **kwargs):
+            self.connected = True
+
+        @self.mqtt.on_disconnect()
+        def handle_disconnect(*args, **kwargs):
+            self.connected = False
+
+        self.assertFalse(self.connected)
+        self.mqtt.init_app(self.app)
+        wait()
+        self.assertTrue(self.connected)
+        self.mqtt._disconnect()
+        wait()
+        self.assertFalse(self.connected)
+
+
 if __name__ == '__main__':
-    unittest.main() 
+    unittest.main()
