@@ -1,6 +1,11 @@
 Changelog
 =========
 
+Version 0.0.11
+--------------
+* add websockets support
+* fix bug with qos subscriptions
+
 Version 0.0.10
 --------------
 * add `on_connect` and `on_disconnect` decorators
