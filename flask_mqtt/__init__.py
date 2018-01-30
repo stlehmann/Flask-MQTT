@@ -22,8 +22,7 @@ class Mqtt():
         self.app = app
         self._connect_handler = None
         self._disconnect_handler = None
-
-        self.client = Client()
+        self.client = Client(app.config.get('MQTT_CLIENT_ID')) if app.config.get('MQTT_CLIENT_ID') else Client()
         self.client.on_connect = self._handle_connect
         self.client.on_disconnect = self._handle_disconnect
         self.topics = {}  # type: List[TopicQos]
@@ -37,6 +36,7 @@ class Mqtt():
         self.username = app.config.get('MQTT_USERNAME')
         self.password = app.config.get('MQTT_PASSWORD')
         self.broker_url = app.config.get('MQTT_BROKER_URL', 'localhost')
+        self.transport = app.config.get('MQTT_BROKER_TRANSPORT', 'tcp')
         self.broker_port = app.config.get('MQTT_BROKER_PORT', 1883)
         self.tls_enabled = app.config.get('MQTT_TLS_ENABLED', False)
         self.keepalive = app.config.get('MQTT_KEEPALIVE', 60)
