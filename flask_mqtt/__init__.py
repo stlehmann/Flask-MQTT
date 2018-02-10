@@ -22,7 +22,7 @@ class Mqtt():
         self.app = app
         self._connect_handler = None
         self._disconnect_handler = None
-        self.topics = {}  # type: List[TopicQos]
+        self.topics = {}  # type: Dict[str]
         self.connected = False
 
         if app is not None:
