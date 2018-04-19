@@ -1,6 +1,10 @@
 Changelog
 =========
 
+Version 1.0.1
+-------------
+* Establish Flake8 conformity
+
 Version 0.0.11
 --------------
 * add websockets support
