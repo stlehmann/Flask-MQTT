@@ -1,6 +1,10 @@
 Changelog
 =========
 
+Version 1.0.2
+-------------
+* nothing special
+
 Version 1.0.1
 -------------
 * Establish Flake8 conformity

@@ -9,6 +9,8 @@ name = "pypi"
 
 flask = "*"
 paho-mqtt = "*"
+twine = "*"
+setuptools = "*"
 
 
 [dev-packages]
