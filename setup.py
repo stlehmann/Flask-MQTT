@@ -1,3 +1,4 @@
+"""Flask-MQTT Setup."""
 import io
 import re
 import os
@@ -6,6 +7,7 @@ from setuptools import setup
 
 
 def read(*names, **kwargs):
+    """Open a file and read its content."""
     with io.open(
         os.path.join(os.path.dirname(__file__), *names),
         encoding=kwargs.get("encoding", "utf8")
@@ -14,12 +16,16 @@ def read(*names, **kwargs):
 
 
 def find_version(*file_paths):
+    """Find current package version number."""
     version_file = read(*file_paths)
     version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]",
                               version_file, re.M)
     if version_match:
         return version_match.group(1)
     raise RuntimeError("Unable to find version string.")
+
+
+long_description = read('README.md')
 
 
 if sys.argv[-1] == 'test':
@@ -35,6 +41,8 @@ else:
         author='Stefan Lehmann',
         author_email='stefan.st.lehmann@gmail.com',
         description='Flask extension for the MQTT protocol',
+        long_description=long_description,
+        long_description_content_type='text/markdown',
         packages=['flask_mqtt'],
         platforms='any',
         install_requires=[
@@ -43,7 +51,7 @@ else:
             'paho-mqtt'
         ],
         classifiers=[
-            'Development Status :: 4 - Beta',
+            'Development Status :: 5 - Production/Stable',
             'Environment :: Web Environment',
             'Intended Audience :: Developers',
             'License :: OSI Approved :: MIT License',

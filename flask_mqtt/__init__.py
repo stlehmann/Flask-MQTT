@@ -1,21 +1,50 @@
+"""Flask-MQTT Package.
+
+:author: Stefan Lehmann <stlm@posteo.de>
+:license: MIT, see license file or https://opensource.org/licenses/MIT
+
+:created on 2018-04-19 19:43:41
+:last modified by:   Stefan Lehmann
+:last modified time: 2018-04-19 20:08:15
+
+"""
 import ssl
 from collections import namedtuple
-from paho.mqtt.client import Client, MQTT_ERR_SUCCESS, MQTT_ERR_ACL_DENIED, \
-    MQTT_ERR_AGAIN, MQTT_ERR_AUTH, MQTT_ERR_CONN_LOST, MQTT_ERR_CONN_REFUSED, \
-    MQTT_ERR_ERRNO, MQTT_ERR_INVAL, MQTT_ERR_NO_CONN, MQTT_ERR_NOMEM, \
-    MQTT_ERR_NOT_FOUND, MQTT_ERR_NOT_SUPPORTED, MQTT_ERR_PAYLOAD_SIZE, \
-    MQTT_ERR_PROTOCOL, MQTT_ERR_QUEUE_SIZE, MQTT_ERR_TLS, MQTT_ERR_UNKNOWN, \
-    MQTT_LOG_DEBUG, MQTT_LOG_ERR, MQTT_LOG_INFO, MQTT_LOG_NOTICE, \
-    MQTT_LOG_WARNING
+from paho.mqtt.client import (  # noqa: F401
+    Client,
+    MQTT_ERR_SUCCESS,
+    MQTT_ERR_ACL_DENIED,
+    MQTT_ERR_AGAIN,
+    MQTT_ERR_AUTH,
+    MQTT_ERR_CONN_LOST,
+    MQTT_ERR_CONN_REFUSED,
+    MQTT_ERR_ERRNO,
+    MQTT_ERR_INVAL,
+    MQTT_ERR_NO_CONN,
+    MQTT_ERR_NOMEM,
+    MQTT_ERR_NOT_FOUND,
+    MQTT_ERR_NOT_SUPPORTED,
+    MQTT_ERR_PAYLOAD_SIZE,
+    MQTT_ERR_PROTOCOL,
+    MQTT_ERR_QUEUE_SIZE,
+    MQTT_ERR_TLS,
+    MQTT_ERR_UNKNOWN,
+    MQTT_LOG_DEBUG,
+    MQTT_LOG_ERR,
+    MQTT_LOG_INFO,
+    MQTT_LOG_NOTICE,
+    MQTT_LOG_WARNING,
+)
 
 
-__version__ = '0.0.11'
+__version__ = "1.0.1"
 
 
-TopicQos = namedtuple('TopicQos', ['topic', 'qos'])
+TopicQos = namedtuple("TopicQos", ["topic", "qos"])
 
 
 class Mqtt():
+    """Main Mqtt class."""
 
     def __init__(self, app=None):
         # type: (Flask) -> None
@@ -29,41 +58,48 @@ class Mqtt():
             self.init_app(app)
 
     def init_app(self, app):
+        """Init the Flask-MQTT addon."""
         # type: (Flask) -> None
 
         self.client = Client(
-            client_id=app.config.get('MQTT_CLIENT_ID', ''),
-            transport=app.config.get('MQTT_TRANSPORT', 'tcp'),
+            client_id=app.config.get("MQTT_CLIENT_ID", ""),
+            transport=app.config.get("MQTT_TRANSPORT", "tcp"),
         )
 
         self.client.on_connect = self._handle_connect
         self.client.on_disconnect = self._handle_disconnect
-        self.username = app.config.get('MQTT_USERNAME')
-        self.password = app.config.get('MQTT_PASSWORD')
-        self.broker_url = app.config.get('MQTT_BROKER_URL', 'localhost')
-        self.broker_port = app.config.get('MQTT_BROKER_PORT', 1883)
-        self.tls_enabled = app.config.get('MQTT_TLS_ENABLED', False)
-        self.keepalive = app.config.get('MQTT_KEEPALIVE', 60)
-        self.last_will_topic = app.config.get('MQTT_LAST_WILL_TOPIC')
-        self.last_will_message = app.config.get('MQTT_LAST_WILL_MESSAGE')
-        self.last_will_qos = app.config.get('MQTT_LAST_WILL_QOS', 0)
-        self.last_will_retain = app.config.get('MQTT_LAST_WILL_RETAIN', False)
+        self.username = app.config.get("MQTT_USERNAME")
+        self.password = app.config.get("MQTT_PASSWORD")
+        self.broker_url = app.config.get("MQTT_BROKER_URL", "localhost")
+        self.broker_port = app.config.get("MQTT_BROKER_PORT", 1883)
+        self.tls_enabled = app.config.get("MQTT_TLS_ENABLED", False)
+        self.keepalive = app.config.get("MQTT_KEEPALIVE", 60)
+        self.last_will_topic = app.config.get("MQTT_LAST_WILL_TOPIC")
+        self.last_will_message = app.config.get("MQTT_LAST_WILL_MESSAGE")
+        self.last_will_qos = app.config.get("MQTT_LAST_WILL_QOS", 0)
+        self.last_will_retain = app.config.get("MQTT_LAST_WILL_RETAIN", False)
 
         if self.tls_enabled:
-            self.tls_ca_certs = app.config['MQTT_TLS_CA_CERTS']
-            self.tls_certfile = app.config.get('MQTT_TLS_CERTFILE')
-            self.tls_keyfile = app.config.get('MQTT_TLS_KEYFILE')
-            self.tls_cert_reqs = app.config.get('MQTT_TLS_CERT_REQS',
-                                                ssl.CERT_REQUIRED)
-            self.tls_version = app.config.get('MQTT_TLS_VERSION',
-                                              ssl.PROTOCOL_TLSv1)
-            self.tls_ciphers = app.config.get('MQTT_TLS_CIPHERS')
-            self.tls_insecure = app.config.get('MQTT_TLS_INSECURE', False)
+            self.tls_ca_certs = app.config["MQTT_TLS_CA_CERTS"]
+            self.tls_certfile = app.config.get("MQTT_TLS_CERTFILE")
+            self.tls_keyfile = app.config.get("MQTT_TLS_KEYFILE")
+            self.tls_cert_reqs = app.config.get(
+                "MQTT_TLS_CERT_REQS", ssl.CERT_REQUIRED
+            )
+            self.tls_version = app.config.get(
+                "MQTT_TLS_VERSION", ssl.PROTOCOL_TLSv1
+            )
+            self.tls_ciphers = app.config.get("MQTT_TLS_CIPHERS")
+            self.tls_insecure = app.config.get("MQTT_TLS_INSECURE", False)
 
         # set last will message
         if self.last_will_topic is not None:
-            self.client.will_set(self.last_will_topic, self.last_will_message,
-                                 self.last_will_qos, self.last_will_retain)
+            self.client.will_set(
+                self.last_will_topic,
+                self.last_will_message,
+                self.last_will_qos,
+                self.last_will_retain,
+            )
         self._connect()
 
     def _connect(self):
@@ -86,8 +122,9 @@ class Mqtt():
                 ciphers=self.tls_ciphers,
             )
         self.client.loop_start()
-        self.client.connect(self.broker_url, self.broker_port,
-                            keepalive=self.keepalive)
+        self.client.connect(
+            self.broker_url, self.broker_port, keepalive=self.keepalive
+        )
 
     def _disconnect(self):
         # type: () -> None
@@ -111,7 +148,8 @@ class Mqtt():
 
     def on_topic(self, topic):
         # type: (str) -> Callable
-        """
+        """Decorator.
+
         Decorator to add a callback function that is called when a certain
         topic has been published. The callback function is expected to have the
         following form: `handle_topic(client, userdata, message)`
@@ -133,12 +171,12 @@ class Mqtt():
             def handle_mytopic(client, userdata, message):
                 print('Received message on topic {}: {}'
                       .format(message.topic, message.payload.decode()))
-
         """
         def decorator(handler):
             # type: (Callable[[str], None]) -> Callable[[str], None]
             self.client.message_callback_add(topic, handler)
             return handler
+
         return decorator
 
     def subscribe(self, topic, qos=0):
@@ -212,10 +250,7 @@ class Mqtt():
 
     def unsubscribe_all(self):
         # type: () -> None
-        """
-        Unsubscribe from all topics.
-
-        """
+        """Unsubscribe from all topics."""
         topics = list(self.topics.keys())
         for topic in topics:
             self.unsubscribe(topic)
@@ -247,29 +282,33 @@ class Mqtt():
         return self.client.publish(topic, payload, qos, retain)
 
     def on_connect(self):
-        """
+        """Decorator.
+
         Decorator to handle the event when the broker responds to a connection
         request. Only the last decorated function will be called.
-
         """
         def decorator(handler):
             self._connect_handler = handler
             return handler
+
         return decorator
 
     def on_disconnect(self):
-        """
+        """Decorator.
+
         Decorator to handle the event when client disconnects from broker. Only
         the last decorated function will be called.
         """
         def decorator(handler):
             self._disconnect_handler = handler
             return handler
+
         return decorator
 
     def on_message(self):
         # type: () -> Callable
-        """
+        """Decorator.
+
         Decorator to handle all messages that have been subscribed and that
         are not handled via the `on_message` decorator.
 
@@ -283,16 +322,17 @@ class Mqtt():
             def handle_messages(client, userdata, message):
                 print('Received message on topic {}: {}'
                       .format(message.topic, message.payload.decode()))
-
         """
         def decorator(handler):
             # type: (Callable) -> Callable
             self.client.on_message = handler
             return handler
+
         return decorator
 
     def on_publish(self):
-        """
+        """Decorator.
+
         Decorator to handle all messages that have been published by the
         client.
 
@@ -303,15 +343,14 @@ class Mqtt():
                 print('Published message with mid {}.'
                       .format(mid))
         """
-
         def decorator(handler):
             self.client.on_publish = handler
             return handler
+
         return decorator
 
     def on_subscribe(self):
-        """
-        Decorator to handle subscribe callbacks.
+        """Decorate a callback function to handle subscritions.
 
         **Usage:**::
 
@@ -319,17 +358,15 @@ class Mqtt():
             def handle_subscribe(client, userdata, mid, granted_qos):
                 print('Subscription id {} granted with qos {}.'
                       .format(mid, granted_qos))
-
         """
-
         def decorator(handler):
             self.client.on_subscribe = handler
             return handler
+
         return decorator
 
     def on_unsubscribe(self):
-        """
-        Decorator to handle unsubscribe callbacks.
+        """Decorate a callback funtion to handle unsubscribtions.
 
         **Usage:**::
 
@@ -337,17 +374,16 @@ class Mqtt():
             def handle_unsubscribe(client, userdata, mid)
                 print('Unsubscribed from topic (id: {})'
                       .format(mid)')
-
         """
         def decorator(handler):
             self.client.on_unsubscribe = handler
             return handler
+
         return decorator
 
     def on_log(self):
         # type: () -> Callable
-        """
-        Decorator to handle MQTT logging.
+        """Decorate a callback function to handle MQTT logging.
 
         **Example Usage:**
 
@@ -356,10 +392,10 @@ class Mqtt():
             @mqtt.on_log()
             def handle_logging(client, userdata, level, buf):
                 print(client, userdata, level, buf)
-
         """
         def decorator(handler):
             # type: (Callable) -> Callable
             self.client.on_log = handler
             return handler
+
         return decorator
