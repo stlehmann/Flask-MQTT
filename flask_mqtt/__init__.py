@@ -5,7 +5,7 @@
 
 :created on 2018-04-19 19:43:41
 :last modified by:   Stefan Lehmann
-:last modified time: 2018-04-19 20:17:46
+:last modified time: 2018-04-19 20:36:03
 
 """
 import ssl
@@ -37,7 +37,7 @@ from paho.mqtt.client import (  # noqa: F401
 )
 
 
-__version__ = "1.0.2"
+__version__ = "1.0.3"
 
 
 TopicQos = namedtuple("TopicQos", ["topic", "qos"])
