@@ -61,6 +61,7 @@ class Mqtt():
         """Init the Flask-MQTT addon."""
         # type: (Flask) -> None
 
+        self.app = app
         self.client = Client(
             client_id=app.config.get("MQTT_CLIENT_ID", ""),
             transport=app.config.get("MQTT_TRANSPORT", "tcp"),
