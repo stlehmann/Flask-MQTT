@@ -5,10 +5,12 @@
 
 :created on 2018-04-19 19:43:41
 :last modified by:   Stefan Lehmann
-:last modified time: 2018-04-19 20:36:03
+:last modified time: 2018-06-24 12:54:11
 
 """
 import ssl
+import logging
+from flask.logging import default_handler
 from collections import namedtuple
 from paho.mqtt.client import (  # noqa: F401
     Client,
@@ -40,7 +42,14 @@ from paho.mqtt.client import (  # noqa: F401
 __version__ = "1.0.3"
 
 
+#: Container for topic + qos
 TopicQos = namedtuple("TopicQos", ["topic", "qos"])
+
+
+# Init logger
+logger = logging.getLogger('flask.flask_mqtt')
+logger.setLevel(logging.DEBUG)
+logger.addHandler(default_handler)
 
 
 class Mqtt():
@@ -58,12 +67,11 @@ class Mqtt():
             self.init_app(app)
 
     def init_app(self, app):
-        """Init the Flask-MQTT addon."""
         # type: (Flask) -> None
-
-        self.app = app
+        """Init the Flask-MQTT addon."""
+        self.client_id = app.config.get("MQTT_CLIENT_ID", "")
         self.client = Client(
-            client_id=app.config.get("MQTT_CLIENT_ID", ""),
+            client_id=self.client_id,
             transport=app.config.get("MQTT_TRANSPORT", "tcp"),
         )
 
@@ -84,12 +92,8 @@ class Mqtt():
             self.tls_ca_certs = app.config["MQTT_TLS_CA_CERTS"]
             self.tls_certfile = app.config.get("MQTT_TLS_CERTFILE")
             self.tls_keyfile = app.config.get("MQTT_TLS_KEYFILE")
-            self.tls_cert_reqs = app.config.get(
-                "MQTT_TLS_CERT_REQS", ssl.CERT_REQUIRED
-            )
-            self.tls_version = app.config.get(
-                "MQTT_TLS_VERSION", ssl.PROTOCOL_TLSv1
-            )
+            self.tls_cert_reqs = app.config.get("MQTT_TLS_CERT_REQS", ssl.CERT_REQUIRED)
+            self.tls_version = app.config.get("MQTT_TLS_VERSION", ssl.PROTOCOL_TLSv1)
             self.tls_ciphers = app.config.get("MQTT_TLS_CIPHERS")
             self.tls_insecure = app.config.get("MQTT_TLS_INSECURE", False)
 
@@ -101,6 +105,7 @@ class Mqtt():
                 self.last_will_qos,
                 self.last_will_retain,
             )
+
         self._connect()
 
     def _connect(self):
@@ -123,14 +128,24 @@ class Mqtt():
                 ciphers=self.tls_ciphers,
             )
         self.client.loop_start()
-        self.client.connect(
+
+        res = self.client.connect(
             self.broker_url, self.broker_port, keepalive=self.keepalive
         )
+        if res == 0:
+            logger.debug(
+                "Connected client '{0}' to broker {1}:{2}".format(self.client_id, self.broker_url, self.broker_port)
+            )
+        else:
+            logger.error(
+                "Could not connect to MQTT Broker, Error Code: {0}".format(res)
+            )
 
     def _disconnect(self):
         # type: () -> None
         self.client.loop_stop()
         self.client.disconnect()
+        logger.debug('Disconnected from Broker')
 
     def _handle_connect(self, client, userdata, flags, rc):
         # type: (Client, Any, Dict, int) -> None
@@ -173,6 +188,7 @@ class Mqtt():
                 print('Received message on topic {}: {}'
                       .format(message.topic, message.payload.decode()))
         """
+
         def decorator(handler):
             # type: (Callable[[str], None]) -> Callable[[str], None]
             self.client.message_callback_add(topic, handler)
@@ -217,11 +233,12 @@ class Mqtt():
         # if successful add to topics
         if result == MQTT_ERR_SUCCESS:
             self.topics[topic] = TopicQos(topic=topic, qos=qos)
+            logger.debug('Subscribed to topic: {0}, qos: {1}'.format(topic, qos))
 
         return (result, mid)
 
     def unsubscribe(self, topic):
-        # type: (str) -> tuple(int, int)
+        # type: (str) -> Tuple[int, int]
         """
         Unsubscribe from a single topic.
 
@@ -288,6 +305,7 @@ class Mqtt():
         Decorator to handle the event when the broker responds to a connection
         request. Only the last decorated function will be called.
         """
+
         def decorator(handler):
             self._connect_handler = handler
             return handler
@@ -300,6 +318,7 @@ class Mqtt():
         Decorator to handle the event when client disconnects from broker. Only
         the last decorated function will be called.
         """
+
         def decorator(handler):
             self._disconnect_handler = handler
             return handler
@@ -324,6 +343,7 @@ class Mqtt():
                 print('Received message on topic {}: {}'
                       .format(message.topic, message.payload.decode()))
         """
+
         def decorator(handler):
             # type: (Callable) -> Callable
             self.client.on_message = handler
@@ -344,6 +364,7 @@ class Mqtt():
                 print('Published message with mid {}.'
                       .format(mid))
         """
+
         def decorator(handler):
             self.client.on_publish = handler
             return handler
@@ -360,6 +381,7 @@ class Mqtt():
                 print('Subscription id {} granted with qos {}.'
                       .format(mid, granted_qos))
         """
+
         def decorator(handler):
             self.client.on_subscribe = handler
             return handler
@@ -376,6 +398,7 @@ class Mqtt():
                 print('Unsubscribed from topic (id: {})'
                       .format(mid)')
         """
+
         def decorator(handler):
             self.client.on_unsubscribe = handler
             return handler
@@ -394,6 +417,7 @@ class Mqtt():
             def handle_logging(client, userdata, level, buf):
                 print(client, userdata, level, buf)
         """
+
         def decorator(handler):
             # type: (Callable) -> Callable
             self.client.on_log = handler
