@@ -5,7 +5,7 @@
 
 :created on 2018-04-19 19:43:41
 :last modified by:   Stefan Lehmann
-:last modified time: 2018-06-24 12:54:11
+:last modified time: 2018-06-24 13:09:18
 
 """
 import ssl
@@ -188,7 +188,6 @@ class Mqtt():
                 print('Received message on topic {}: {}'
                       .format(message.topic, message.payload.decode()))
         """
-
         def decorator(handler):
             # type: (Callable[[str], None]) -> Callable[[str], None]
             self.client.message_callback_add(topic, handler)
@@ -197,7 +196,7 @@ class Mqtt():
         return decorator
 
     def subscribe(self, topic, qos=0):
-        # type: (str, int) -> tuple(int, int)
+        # type: (str, int) -> Tuple[int, int]
         """
         Subscribe to a certain topic.
 

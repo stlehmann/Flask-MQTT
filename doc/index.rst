@@ -24,9 +24,13 @@ or monitor and control these devices from one or multiple clients.
    changelog
    api/index
 
-Support
-=======
-This package uses type annotations so it needs Python 3.6 or Python 2.7/3.x 
+Limitations
+===========
+**Flask-MQTT is currently not suitable for the use with multiple worker
+instances.** So if you use a WSGI server like *gevent* or *gunicorn* make sure
+you only have one worker instance.
+
+This package uses type annotations so it needs Python 3.6 or Python 2.7/3.x
 with the `typing package <https://pypi.python.org/pypi/typing>`_ installed.
 
 Indices and tables
