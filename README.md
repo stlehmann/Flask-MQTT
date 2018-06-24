@@ -23,6 +23,10 @@ Find the documentation on [http://flask-mqtt.readthedocs.io][2].
 instances.** So if you use a WSGI server like *gevent* or *gunicorn* make sure
 you only have one worker instance.
 
+Flask-MQTT was developed to provide an easy-to-setup solution for interacting
+with IoT devices. A typical scenario would be a Raspberry Pi running a
+mosquitto mqtt server combined with a Flask webserver.
+
 ## Installation
 
 Simply install the package as usual via pip:
