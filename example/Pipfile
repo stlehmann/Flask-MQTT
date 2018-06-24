@@ -13,7 +13,6 @@ enum-compat = "*"
 "enum34" = "*"
 eventlet = "*"
 Flask-Bootstrap = "*"
-Flask-MQTT = "*"
 Flask-SocketIO = "*"
 Flask = "*"
 greenlet = "*"
@@ -29,5 +28,6 @@ Werkzeug = "*"
 
 
 [dev-packages]
+
 ptpython = "*"
 pdbpp = "*"
