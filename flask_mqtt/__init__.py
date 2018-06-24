@@ -5,13 +5,15 @@
 
 :created on 2018-04-19 19:43:41
 :last modified by:   Stefan Lehmann
-:last modified time: 2018-06-24 13:09:18
+:last modified time: 2018-06-24 13:33:18
 
 """
 import ssl
 import logging
 from flask.logging import default_handler
 from collections import namedtuple
+from flask import Flask  # noqa: F401
+from typing import Dict, Any, Callable, Tuple, Optional  # noqa: F401
 from paho.mqtt.client import (  # noqa: F401
     Client,
     MQTT_ERR_SUCCESS,
@@ -58,9 +60,9 @@ class Mqtt():
     def __init__(self, app=None):
         # type: (Flask) -> None
         self.app = app
-        self._connect_handler = None
-        self._disconnect_handler = None
-        self.topics = {}  # type: Dict[str]
+        self._connect_handler = None  # type: Optional[Callable]
+        self._disconnect_handler = None  # type: Optional[Callable]
+        self.topics = {}  # type: Dict[str, TopicQos]
         self.connected = False
 
         if app is not None:
@@ -92,8 +94,10 @@ class Mqtt():
             self.tls_ca_certs = app.config["MQTT_TLS_CA_CERTS"]
             self.tls_certfile = app.config.get("MQTT_TLS_CERTFILE")
             self.tls_keyfile = app.config.get("MQTT_TLS_KEYFILE")
-            self.tls_cert_reqs = app.config.get("MQTT_TLS_CERT_REQS", ssl.CERT_REQUIRED)
-            self.tls_version = app.config.get("MQTT_TLS_VERSION", ssl.PROTOCOL_TLSv1)
+            self.tls_cert_reqs = app.config.get("MQTT_TLS_CERT_REQS",
+                                                ssl.CERT_REQUIRED)
+            self.tls_version = app.config.get("MQTT_TLS_VERSION",
+                                              ssl.PROTOCOL_TLSv1)
             self.tls_ciphers = app.config.get("MQTT_TLS_CIPHERS")
             self.tls_insecure = app.config.get("MQTT_TLS_INSECURE", False)
 
@@ -134,7 +138,8 @@ class Mqtt():
         )
         if res == 0:
             logger.debug(
-                "Connected client '{0}' to broker {1}:{2}".format(self.client_id, self.broker_url, self.broker_port)
+                "Connected client '{0}' to broker {1}:{2}"
+                .format(self.client_id, self.broker_url, self.broker_port)
             )
         else:
             logger.error(
@@ -232,12 +237,16 @@ class Mqtt():
         # if successful add to topics
         if result == MQTT_ERR_SUCCESS:
             self.topics[topic] = TopicQos(topic=topic, qos=qos)
-            logger.debug('Subscribed to topic: {0}, qos: {1}'.format(topic, qos))
+            logger.debug('Subscribed to topic: {0}, qos: {1}'
+                         .format(topic, qos))
+        else:
+            logger.error('Error {0} subscribing to topic: {1}'
+                         .format(result, topic))
 
         return (result, mid)
 
     def unsubscribe(self, topic):
-        # type: (str) -> Tuple[int, int]
+        # type: (str) -> Optional[Tuple[int, int]]
         """
         Unsubscribe from a single topic.
 
@@ -261,9 +270,14 @@ class Mqtt():
 
             if result == MQTT_ERR_SUCCESS:
                 self.topics.pop(topic)
+                logger.debug('Unsubscribed from topic: {0}'.format(topic))
+            else:
+                logger.debug('Error {0} unsubscribing from topic: {1}'
+                             .format(result, topic))
 
             # if successful remove from topics
             return result, mid
+        return None
 
     def unsubscribe_all(self):
         # type: () -> None
@@ -296,29 +310,41 @@ class Mqtt():
         """
         if not self.connected:
             self.client.reconnect()
-        return self.client.publish(topic, payload, qos, retain)
+
+        result, mid = self.client.publish(topic, payload, qos, retain)
+        if result == MQTT_ERR_SUCCESS:
+            logger.debug('Published topic {0}: {1}'.format(topic, payload))
+        else:
+            logger.error('Error {0} publishing topic {1}'
+                         .format(result, topic))
+
+        return (result, mid)
 
     def on_connect(self):
+        # type: () -> Callable
         """Decorator.
 
         Decorator to handle the event when the broker responds to a connection
         request. Only the last decorated function will be called.
-        """
 
+        """
         def decorator(handler):
+            # type: (Callable) -> Callable
             self._connect_handler = handler
             return handler
 
         return decorator
 
     def on_disconnect(self):
+        # type: () -> Callable
         """Decorator.
 
         Decorator to handle the event when client disconnects from broker. Only
         the last decorated function will be called.
-        """
 
+        """
         def decorator(handler):
+            # type: (Callable) -> Callable
             self._disconnect_handler = handler
             return handler
 
@@ -342,7 +368,6 @@ class Mqtt():
                 print('Received message on topic {}: {}'
                       .format(message.topic, message.payload.decode()))
         """
-
         def decorator(handler):
             # type: (Callable) -> Callable
             self.client.on_message = handler
@@ -351,6 +376,7 @@ class Mqtt():
         return decorator
 
     def on_publish(self):
+        # type: () -> Callable
         """Decorator.
 
         Decorator to handle all messages that have been published by the
@@ -363,14 +389,15 @@ class Mqtt():
                 print('Published message with mid {}.'
                       .format(mid))
         """
-
         def decorator(handler):
+            # type: (Callable) -> Callable
             self.client.on_publish = handler
             return handler
 
         return decorator
 
     def on_subscribe(self):
+        # type: () -> Callable
         """Decorate a callback function to handle subscritions.
 
         **Usage:**::
@@ -380,14 +407,15 @@ class Mqtt():
                 print('Subscription id {} granted with qos {}.'
                       .format(mid, granted_qos))
         """
-
         def decorator(handler):
+            # type: (Callable) -> Callable
             self.client.on_subscribe = handler
             return handler
 
         return decorator
 
     def on_unsubscribe(self):
+        # type: () -> Callable
         """Decorate a callback funtion to handle unsubscribtions.
 
         **Usage:**::
@@ -397,8 +425,8 @@ class Mqtt():
                 print('Unsubscribed from topic (id: {})'
                       .format(mid)')
         """
-
         def decorator(handler):
+            # type: (Callable) -> Callable
             self.client.on_unsubscribe = handler
             return handler
 
@@ -416,7 +444,6 @@ class Mqtt():
             def handle_logging(client, userdata, level, buf):
                 print(client, userdata, level, buf)
         """
-
         def decorator(handler):
             # type: (Callable) -> Callable
             self.client.on_log = handler
