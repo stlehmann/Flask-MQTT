@@ -1,6 +1,13 @@
 Usage
 =====
 
+Limitations
+-----------
+
+**Flask-MQTT is currently not suitable for the use with multiple worker
+instances.** So if you use a WSGI server like *gevent* or *gunicorn* make sure
+you only have one worker instance.
+
 Connect to a broker
 -------------------
 To connect to a broker you only need to initialize the `Flask-MQTT` extension

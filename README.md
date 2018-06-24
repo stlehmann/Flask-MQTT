@@ -17,6 +17,12 @@ Find the documentation on [http://flask-mqtt.readthedocs.io][2].
 * use callbacks for certain topics
 * use one callback for all subscribed topics
 
+## Limitations
+
+**Flask-MQTT is currently not suitable for the use with multiple worker
+instances.** So if you use a WSGI server like *gevent* or *gunicorn* make sure
+you only have one worker instance.
+
 ## Installation
 
 Simply install the package as usual via pip:
