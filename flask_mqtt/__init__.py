@@ -5,7 +5,7 @@
 
 :created on 2018-04-19 19:43:41
 :last modified by:   Stefan Lehmann
-:last modified time: 2018-06-24 13:33:18
+:last modified time: 2018-06-24 13:54:41
 
 """
 import ssl
@@ -41,7 +41,7 @@ from paho.mqtt.client import (  # noqa: F401
 )
 
 
-__version__ = "1.0.3"
+__version__ = "1.0.4"
 
 
 #: Container for topic + qos

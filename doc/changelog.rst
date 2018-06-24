@@ -1,6 +1,13 @@
 Changelog
 =========
 
+Version 1.0.4
+-------------
+* complete coverage with type annotations
+* add logging
+* update Pipfile and add requirements.txt
+* add limitation hint in the documentation and readme
+
 Version 1.0.2
 -------------
 * nothing special
