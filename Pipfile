@@ -1,20 +1,16 @@
 [[source]]
-
 url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
 
-
 [packages]
-
 flask = "*"
 paho-mqtt = "*"
 twine = "*"
 setuptools = "*"
-
+typing = "*"
 
 [dev-packages]
-
 mypy = "*"
 sphinx = "*"
 tox = "*"
