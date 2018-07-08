@@ -17,6 +17,10 @@ or monitor and control these devices from one or multiple clients.
 
 Limitations
 -----------
+
+Multiple workers
+~~~~~~~~~~~~~~~~
+
 **Flask-MQTT is currently not suitable for the use with multiple worker
 instances.** So if you use a WSGI server like *gevent* or *gunicorn* make sure
 you only have one worker instance.
@@ -24,6 +28,17 @@ you only have one worker instance.
 Flask-MQTT was developed to provide an easy-to-setup solution for interacting
 with IoT devices. A typical scenario would be a Raspberry Pi running a
 mosquitto mqtt server combined with a Flask webserver.
+
+Reloader
+~~~~~~~
+
+Make sure to disable Flasks autoreloader. If activated it spawns two
+instances of a Flask application. This leads to the same problems as multiple
+workers. To prevent Flask-MQTT from running code twice it is necessary to
+deactivate the automatic reloader.
+
+Type annotations
+~~~~~~~~~~~~~~~~
 
 This package uses type annotations so it needs Python 3.6 or Python 2.7/3.x
 with the `typing package <https://pypi.python.org/pypi/typing>`_ installed.
