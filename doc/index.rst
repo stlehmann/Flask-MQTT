@@ -43,6 +43,9 @@ Type annotations
 This package uses type annotations so it needs Python 3.6 or Python 2.7/3.x
 with the `typing package <https://pypi.python.org/pypi/typing>`_ installed.
 
+Content
+=======
+
 .. toctree::
    :maxdepth: 2
 
