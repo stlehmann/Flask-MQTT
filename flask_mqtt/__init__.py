@@ -120,9 +120,6 @@ class Mqtt():
 
         # security
         if self.tls_enabled:
-            if self.tls_insecure:
-                self.client.tls_insecure_set(self.tls_insecure)
-
             self.client.tls_set(
                 ca_certs=self.tls_ca_certs,
                 certfile=self.tls_certfile,
@@ -131,6 +128,9 @@ class Mqtt():
                 tls_version=self.tls_version,
                 ciphers=self.tls_ciphers,
             )
+
+            if self.tls_insecure:
+                self.client.tls_insecure_set(self.tls_insecure)
         self.client.loop_start()
 
         res = self.client.connect(
