@@ -99,4 +99,7 @@ Configuration Keys
 ``MQTT_TRANSPORT``             set to "websockets" to send MQTT over
                                WebSockets. Leave at the default of "tcp" to
                                use raw TCP.
+
+``MQTT_PROTOCOL_VERSION``      The version of the MQTT protocol to use. Can be
+                               either ``MQTTv31`` or ``MQTTv311`` (default).
 ============================== ================================================

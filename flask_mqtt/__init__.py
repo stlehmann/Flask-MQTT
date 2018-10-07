@@ -38,6 +38,8 @@ from paho.mqtt.client import (  # noqa: F401
     MQTT_LOG_INFO,
     MQTT_LOG_NOTICE,
     MQTT_LOG_WARNING,
+    MQTTv311,
+    MQTTv31,
 )
 
 
@@ -75,6 +77,7 @@ class Mqtt():
         self.client = Client(
             client_id=self.client_id,
             transport=app.config.get("MQTT_TRANSPORT", "tcp"),
+            protocol=app.config.get("MQTT_PROTOCOL_VERSION", MQTTv311)
         )
 
         self.client.on_connect = self._handle_connect
