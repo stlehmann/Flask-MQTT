@@ -38,7 +38,8 @@ from paho.mqtt.client import (  # noqa: F401
     MQTT_LOG_INFO,
     MQTT_LOG_NOTICE,
     MQTT_LOG_WARNING,
-    MQTTv311
+    MQTTv311,
+    MQTTv31,
 )
 
 
