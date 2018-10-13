@@ -10,7 +10,13 @@
 """
 import ssl
 import logging
-from flask.logging import default_handler
+try:
+    from flask.logging import default_handler
+except ImportError:  # For flask versions before 1.0
+    default_handler = logging.StreamHandler()
+    default_handler.setFormatter(logging.Formatter(
+        '[%(asctime)s] %(levelname)s in %(module)s: %(message)s'
+    ))
 from collections import namedtuple
 from flask import Flask  # noqa: F401
 from typing import Dict, Any, Callable, Tuple, Optional  # noqa: F401
