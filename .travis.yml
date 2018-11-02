@@ -7,18 +7,20 @@ addons:
     packages:
     - git
     - mosquitto
-   
+
 python:
   - "2.7"
   - "3.5"
+  - "3.6"
+  - "3.7"
 
 # command to install dependencies
 install:
-  - pip install .
-  - pip install coverage
+  - pip install -e .
+  - pip install coverage coveralls pytest-cov
 
 script:
-  pytest
+  py.test -v --cov  flask_mqtt
 
 after_success:
   coveralls

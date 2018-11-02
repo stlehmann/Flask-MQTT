@@ -1,0 +1,9 @@
+-r common.in
+mypy
+sphinx
+tox
+twine
+coverage
+coveralls
+pytest-cov
+pytest

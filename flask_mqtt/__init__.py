@@ -5,9 +5,10 @@
 
 :created on 2018-04-19 19:43:41
 :last modified by:   Stefan Lehmann
-:last modified time: 2018-06-24 13:54:41
+:last modified time: 2018-11-02 18:07:39
 
 """
+import sys
 import ssl
 import logging
 try:
@@ -48,12 +49,14 @@ from paho.mqtt.client import (  # noqa: F401
     MQTTv31,
 )
 
+
 # define some alias for python2 compatibility
 if sys.version_info[0] >= 3:
     unicode = str
-    
-    
-__version__ = "1.0.4"
+
+
+# current Flask-MQTT version
+__version__ = "1.0.5"
 
 
 #: Container for topic + qos

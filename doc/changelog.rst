@@ -1,6 +1,11 @@
 Changelog
 =========
 
+Version 1.0.5
+-------------
+* fix issue #40. One can now use the @mqtt decorators before calling `mqtt.init_app()`
+* fix problems with continuous integration on Travis CI
+
 Version 1.0.4
 -------------
 * complete coverage with type annotations
