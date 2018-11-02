@@ -48,7 +48,11 @@ from paho.mqtt.client import (  # noqa: F401
     MQTTv31,
 )
 
-
+# define some alias for python2 compatibility
+if sys.version_info[0] >= 3:
+    unicode = str
+    
+    
 __version__ = "1.0.4"
 
 
@@ -72,6 +76,7 @@ class Mqtt():
         self._disconnect_handler = None  # type: Optional[Callable]
         self.topics = {}  # type: Dict[str, TopicQos]
         self.connected = False
+        self.client = Client()
 
         if app is not None:
             self.init_app(app)
@@ -80,11 +85,12 @@ class Mqtt():
         # type: (Flask) -> None
         """Init the Flask-MQTT addon."""
         self.client_id = app.config.get("MQTT_CLIENT_ID", "")
-        self.client = Client(
-            client_id=self.client_id,
-            transport=app.config.get("MQTT_TRANSPORT", "tcp"),
-            protocol=app.config.get("MQTT_PROTOCOL_VERSION", MQTTv311)
-        )
+        if isinstance(self.client_id, unicode):
+            self.client._client_id = self.client_id.encode('utf-8')
+        else:
+            self.client._client_id = self.client_id
+        self.client._transport = app.config.get("MQTT_TRANSPORT", "tcp").lower()
+        self.client._protocol = app.config.get("MQTT_PROTOCOL_VERSION", MQTTv311)
 
         self.client.on_connect = self._handle_connect
         self.client.on_disconnect = self._handle_disconnect
