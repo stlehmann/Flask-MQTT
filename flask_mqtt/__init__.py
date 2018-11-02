@@ -48,10 +48,11 @@ from paho.mqtt.client import (  # noqa: F401
     MQTTv31,
 )
 
-
 # define some alias for python2 compatibility
 if sys.version_info[0] >= 3:
     unicode = str
+    
+    
 __version__ = "1.0.4"
 
 
