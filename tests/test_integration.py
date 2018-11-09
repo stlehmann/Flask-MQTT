@@ -13,7 +13,7 @@ except KeyError:
 from flask_mqtt import Mqtt, MQTT_ERR_SUCCESS
 
 
-def wait(seconds=5):
+def wait(seconds=2):
     time.sleep(seconds)
 
 

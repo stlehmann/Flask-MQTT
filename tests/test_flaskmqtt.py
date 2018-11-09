@@ -90,10 +90,10 @@ class FlaskMQTTTestCase(unittest.TestCase):
 
     def test_connect_disconnect(self):
         mqtt = Mqtt(self.app)
-        mqtt.client.loop_start.assert_called_once()
-        mqtt.client.connect.assert_called_once()
+        self.assertEqual(1, mqtt.client.loop_start.call_count)
+        self.assertEqual(1, mqtt.client.connect.call_count)
         mqtt._disconnect()
-        mqtt.client.disconnect.assert_called_once()
+        self.assertEqual(1, mqtt.client.disconnect.call_count)
 
 
 if __name__ == '__main__':

@@ -5,7 +5,7 @@
 
 :created on 2018-04-19 19:43:41
 :last modified by:   Stefan Lehmann
-:last modified time: 2018-11-02 18:07:39
+:last modified time: 2018-11-09 17:21:21
 
 """
 import sys
@@ -88,10 +88,12 @@ class Mqtt():
         # type: (Flask) -> None
         """Init the Flask-MQTT addon."""
         self.client_id = app.config.get("MQTT_CLIENT_ID", "")
+
         if isinstance(self.client_id, unicode):
             self.client._client_id = self.client_id.encode('utf-8')
         else:
             self.client._client_id = self.client_id
+
         self.client._transport = app.config.get("MQTT_TRANSPORT", "tcp").lower()
         self.client._protocol = app.config.get("MQTT_PROTOCOL_VERSION", MQTTv311)
 
@@ -149,11 +151,13 @@ class Mqtt():
 
             if self.tls_insecure:
                 self.client.tls_insecure_set(self.tls_insecure)
+
         self.client.loop_start()
 
         res = self.client.connect(
             self.broker_url, self.broker_port, keepalive=self.keepalive
         )
+
         if res == 0:
             logger.debug(
                 "Connected client '{0}' to broker {1}:{2}"
