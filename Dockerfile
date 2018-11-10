@@ -1,4 +1,4 @@
-FROM debian
+FROM ubuntu:xenial
 RUN apt-get update -y
 RUN apt-get install -y mosquitto python3 python3-pip
 COPY . /app
