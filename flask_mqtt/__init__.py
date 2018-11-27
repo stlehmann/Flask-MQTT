@@ -4,20 +4,14 @@
 :license: MIT, see license file or https://opensource.org/licenses/MIT
 
 :created on 2018-04-19 19:43:41
-:last modified by:   Stefan Lehmann
-:last modified time: 2018-11-09 17:21:21
+:last modified by:   Jean Rubillon
+:last modified time: 2018-11-27 16:42:21
 
 """
 import sys
 import ssl
 import logging
-try:
-    from flask.logging import default_handler
-except ImportError:  # For flask versions before 1.0
-    default_handler = logging.StreamHandler()
-    default_handler.setFormatter(logging.Formatter(
-        '[%(asctime)s] %(levelname)s in %(module)s: %(message)s'
-    ))
+
 from collections import namedtuple
 from flask import Flask  # noqa: F401
 from typing import Dict, Any, Callable, Tuple, Optional  # noqa: F401
@@ -64,9 +58,7 @@ TopicQos = namedtuple("TopicQos", ["topic", "qos"])
 
 
 # Init logger
-logger = logging.getLogger('flask.flask_mqtt')
-logger.setLevel(logging.DEBUG)
-logger.addHandler(default_handler)
+logger = logging.getLogger(__name__)
 
 
 class Mqtt():
@@ -80,6 +72,7 @@ class Mqtt():
         self.topics = {}  # type: Dict[str, TopicQos]
         self.connected = False
         self.client = Client()
+        self.client.enable_logger(logger)
 
         if app is not None:
             self.init_app(app)
@@ -88,12 +81,10 @@ class Mqtt():
         # type: (Flask) -> None
         """Init the Flask-MQTT addon."""
         self.client_id = app.config.get("MQTT_CLIENT_ID", "")
-
         if isinstance(self.client_id, unicode):
             self.client._client_id = self.client_id.encode('utf-8')
         else:
             self.client._client_id = self.client_id
-
         self.client._transport = app.config.get("MQTT_TRANSPORT", "tcp").lower()
         self.client._protocol = app.config.get("MQTT_PROTOCOL_VERSION", MQTTv311)
 
@@ -152,12 +143,9 @@ class Mqtt():
             if self.tls_insecure:
                 self.client.tls_insecure_set(self.tls_insecure)
 
-        self.client.loop_start()
-
-        res = self.client.connect(
+        res = self.client.connect_async(
             self.broker_url, self.broker_port, keepalive=self.keepalive
         )
-
         if res == 0:
             logger.debug(
                 "Connected client '{0}' to broker {1}:{2}"
@@ -167,6 +155,8 @@ class Mqtt():
             logger.error(
                 "Could not connect to MQTT Broker, Error Code: {0}".format(res)
             )
+        self.client.loop_start()
+
 
     def _disconnect(self):
         # type: () -> None
