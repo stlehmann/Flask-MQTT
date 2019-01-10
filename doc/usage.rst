@@ -158,7 +158,6 @@ messages and publish messages.
     from flask import Flask, render_template
     from flask_mqtt import Mqtt
     from flask_socketio import SocketIO
-    from flask_bootstrap import Bootstrap
 
     eventlet.monkey_patch()
 
@@ -180,7 +179,6 @@ messages and publish messages.
 
     mqtt = Mqtt(app)
     socketio = SocketIO(app)
-    bootstrap = Bootstrap(app)
 
 
     @app.route('/')
