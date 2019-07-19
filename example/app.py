@@ -55,6 +55,11 @@ def handle_subscribe(json_str):
     mqtt.subscribe(data['topic'], data['qos'])
 
 
+@socketio.on('unsubscribe_all')
+def handle_unsubscribe_all():
+    mqtt.unsubscribe_all()
+
+
 @mqtt.on_message()
 def handle_mqtt_message(client, userdata, message):
     data = dict(
