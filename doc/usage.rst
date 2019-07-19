@@ -220,7 +220,7 @@ messages and publish messages.
 
 
     if __name__ == '__main__':
-        socketio.run(app, host='0.0.0.0', port=5000, use_reloader=True, debug=True)
+        socketio.run(app, host='0.0.0.0', port=5000, use_reloader=False, debug=True)
 
 
 .. _Flask application object: http://flask.pocoo.org/docs/0.12/api/#application-object
