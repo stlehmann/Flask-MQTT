@@ -94,6 +94,13 @@ class Mqtt():
         else:
             self.client._client_id = self.client_id
 
+        self.clean_session = app.config.get("MQTT_CLEAN_SESSION", True)
+        if not isinstance(self.clean_session, bool):
+            raise TypeError('clean session must be a boolean type.')
+        if not self.clean_session and (self.client_id == "" or self.client_id is None):
+            raise ValueError('A client id must be provided if clean session is False.')
+        self.client._clean_session = self.clean_session
+
         self.client._transport = app.config.get("MQTT_TRANSPORT", "tcp").lower()
         self.client._protocol = app.config.get("MQTT_PROTOCOL_VERSION", MQTTv311)
 
