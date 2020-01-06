@@ -1,6 +1,11 @@
 Changelog
 =========
 
+Version 1.0.6 [Unreleased]
+--------------------------
+* Do not install typing when using Python >= 3.5
+  [cekk]
+
 Version 1.0.5
 -------------
 * fix issue #40. One can now use the @mqtt decorators before calling `mqtt.init_app()`
