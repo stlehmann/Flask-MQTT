@@ -94,3 +94,7 @@ doc/_build/*
 venv_*/
 
 Pipfile.log
+
+# IDE configuration
+.idea/
+.vscode/
