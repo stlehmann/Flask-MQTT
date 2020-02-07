@@ -1,0 +1,44 @@
+name: /Users/stefan/Documents/python/projects/Flask-MQTT/example/venv
+channels:
+  - conda-forge
+  - pytorch
+  - defaults
+dependencies:
+  - ca-certificates=2019.11.28=hecc5488_0
+  - certifi=2019.11.28=py38_0
+  - click=7.0=py_0
+  - flask=1.1.1=py_1
+  - flask-socketio=3.3.2=py_0
+  - itsdangerous=1.1.0=py_0
+  - jinja2=2.11.1=py_0
+  - libcxx=9.0.1=1
+  - libffi=3.2.1=h6de7cb9_1006
+  - markupsafe=1.1.1=py38h0b31af3_0
+  - ncurses=6.1=h0a44026_1002
+  - openssl=1.1.1d=h0b31af3_0
+  - pip=20.0.2=py_2
+  - python=3.8.1=hf2284b6_2
+  - readline=8.0=hcfe32e1_0
+  - setuptools=45.1.0=py38_0
+  - six=1.14.0=py38_0
+  - sqlite=3.30.1=h93121df_0
+  - tk=8.6.10=hbbe82c9_0
+  - werkzeug=1.0.0=py_0
+  - wheel=0.34.2=py_1
+  - xz=5.2.4=h1de35cc_1001
+  - zlib=1.2.11=h0b31af3_1006
+  - pip:
+    - dnspython==1.16.0
+    - dominate==2.4.0
+    - eventlet==0.25.1
+    - flask-bootstrap==3.3.7.1
+    - flask-mqtt==1.0.5
+    - greenlet==0.4.15
+    - monotonic==1.5
+    - paho-mqtt==1.5.0
+    - python-engineio==3.11.2
+    - python-socketio==4.4.0
+    - typing==3.7.4.1
+    - visitor==0.1.3
+prefix: /Users/stefan/Documents/python/projects/Flask-MQTT/example/venv
+
