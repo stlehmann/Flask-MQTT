@@ -19,6 +19,7 @@ app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.config['MQTT_BROKER_URL'] = 'broker.hivemq.com'
 app.config['MQTT_BROKER_PORT'] = 1883
 app.config['MQTT_CLIENT_ID'] = 'flask_mqtt'
+app.config['MQTT_CLEAN_SESSION'] = True
 app.config['MQTT_USERNAME'] = ''
 app.config['MQTT_PASSWORD'] = ''
 app.config['MQTT_KEEPALIVE'] = 5
