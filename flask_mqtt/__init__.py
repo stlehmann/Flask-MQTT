@@ -49,7 +49,7 @@ if sys.version_info[0] >= 3:
 
 
 # current Flask-MQTT version
-__version__ = "1.0.5"
+__version__ = "1.0.6"
 
 
 #: Container for topic + qos
