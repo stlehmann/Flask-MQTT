@@ -11,13 +11,6 @@
 import sys
 import ssl
 import logging
-try:
-    from flask.logging import default_handler
-except ImportError:  # For flask versions before 1.0
-    default_handler = logging.StreamHandler()
-    default_handler.setFormatter(logging.Formatter(
-        '[%(asctime)s] %(levelname)s in %(module)s: %(message)s'
-    ))
 from collections import namedtuple
 from flask import Flask  # noqa: F401
 from typing import Dict, Any, Callable, Tuple, Optional  # noqa: F401
@@ -64,15 +57,13 @@ TopicQos = namedtuple("TopicQos", ["topic", "qos"])
 
 
 # Init logger
-logger = logging.getLogger('flask.flask_mqtt')
-logger.setLevel(logging.DEBUG)
-logger.addHandler(default_handler)
+logger = logging.getLogger(__name__)
 
 
 class Mqtt():
     """Main Mqtt class."""
 
-    def __init__(self, app=None):
+    def __init__(self, app=None, mqtt_logging=False):
         # type: (Flask) -> None
         self.app = app
         self._connect_handler = None  # type: Optional[Callable]
@@ -80,6 +71,8 @@ class Mqtt():
         self.topics = {}  # type: Dict[str, TopicQos]
         self.connected = False
         self.client = Client()
+        if mqtt_logging:
+            self.client.enable_logger(logger)
 
         if app is not None:
             self.init_app(app)
