@@ -147,9 +147,7 @@ class Mqtt():
             if self.tls_insecure:
                 self.client.tls_insecure_set(self.tls_insecure)
 
-        self.client.loop_start()
-
-        res = self.client.connect(
+        res = self.client.connect_async(
             self.broker_url, self.broker_port, keepalive=self.keepalive
         )
 
@@ -162,6 +160,8 @@ class Mqtt():
             logger.error(
                 "Could not connect to MQTT Broker, Error Code: {0}".format(res)
             )
+
+        self.client.loop_start()
 
     def _disconnect(self):
         # type: () -> None
