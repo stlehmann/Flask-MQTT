@@ -3,10 +3,6 @@
 :author: Stefan Lehmann <stlm@posteo.de>
 :license: MIT, see license file or https://opensource.org/licenses/MIT
 
-:created on 2018-04-19 19:43:41
-:last modified by:   Stefan Lehmann
-:last modified time: 2018-11-09 17:21:21
-
 """
 import sys
 import ssl
@@ -49,7 +45,7 @@ if sys.version_info[0] >= 3:
 
 
 # current Flask-MQTT version
-__version__ = "1.0.6"
+__version__ = "1.0.7"
 
 
 #: Container for topic + qos
@@ -61,7 +57,13 @@ logger = logging.getLogger(__name__)
 
 
 class Mqtt():
-    """Main Mqtt class."""
+    """Main Mqtt class.
+
+    :param app:  flask application object
+    :param connect_async:  if True then connect_aync will be used to connect to MQTT broker
+    :param mqtt_logging: if True then messages from MQTT client will be logged
+
+    """
 
     def __init__(self, app=None, connect_async=False, mqtt_logging=False):
         # type: (Flask, bool, bool) -> None

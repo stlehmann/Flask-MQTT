@@ -1,10 +1,16 @@
 Changelog
 =========
 
-Version 1.0.6 [Unreleased]
---------------------------
-* Do not install typing when using Python >= 3.5
+Version 1.0.7
+-------------
+* optional support for async mqtt loop
+* include Python 3.7 and 3.8 in ci
+
+Version 1.0.6
+-------------
+* do not install typing when using Python >= 3.5
   [cekk]
+* omit verbose logging messages
 
 Version 1.0.5
 -------------
