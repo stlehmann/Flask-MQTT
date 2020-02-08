@@ -63,9 +63,10 @@ logger = logging.getLogger(__name__)
 class Mqtt():
     """Main Mqtt class."""
 
-    def __init__(self, app=None, mqtt_logging=False):
-        # type: (Flask) -> None
+    def __init__(self, app=None, connect_async=False, mqtt_logging=False):
+        # type: (Flask, bool, bool) -> None
         self.app = app
+        self._connect_async = connect_async  # type: bool
         self._connect_handler = None  # type: Optional[Callable]
         self._disconnect_handler = None  # type: Optional[Callable]
         self.topics = {}  # type: Dict[str, TopicQos]
@@ -147,20 +148,25 @@ class Mqtt():
             if self.tls_insecure:
                 self.client.tls_insecure_set(self.tls_insecure)
 
-        res = self.client.connect_async(
-            self.broker_url, self.broker_port, keepalive=self.keepalive
-        )
-
-        if res == 0:
-            logger.debug(
-                "Connected client '{0}' to broker {1}:{2}"
-                .format(self.client_id, self.broker_url, self.broker_port)
+        if self._connect_async:
+            # if connect_async is used
+            self.client.connect_async(
+                self.broker_url, self.broker_port, keepalive=self.keepalive
             )
         else:
-            logger.error(
-                "Could not connect to MQTT Broker, Error Code: {0}".format(res)
+            res = self.client.connect(
+                self.broker_url, self.broker_port, keepalive=self.keepalive
             )
 
+            if res == 0:
+                logger.debug(
+                    "Connected client '{0}' to broker {1}:{2}"
+                    .format(self.client_id, self.broker_url, self.broker_port)
+                )
+            else:
+                logger.error(
+                    "Could not connect to MQTT Broker, Error Code: {0}".format(res)
+                )
         self.client.loop_start()
 
     def _disconnect(self):
