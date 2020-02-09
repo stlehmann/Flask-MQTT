@@ -47,7 +47,6 @@ else:
         platforms='any',
         install_requires=[
             'Flask',
-            'typing;python_version<"3.5"',
             'paho-mqtt'
         ],
         classifiers=[
