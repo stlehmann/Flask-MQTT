@@ -10,6 +10,7 @@ import logging
 from collections import namedtuple
 from flask import Flask  # noqa: F401
 from typing import Dict, Any, Callable, Tuple, Optional  # noqa: F401
+# noinspection PyUnresolvedReferences
 from paho.mqtt.client import (  # noqa: F401
     Client,
     MQTT_ERR_SUCCESS,
@@ -38,25 +39,21 @@ from paho.mqtt.client import (  # noqa: F401
     MQTTv31,
 )
 
-
 # define some alias for python2 compatibility
 if sys.version_info[0] >= 3:
     unicode = str
 
-
 # current Flask-MQTT version
-__version__ = "1.0.7"
-
+__version__ = "1.1.0"
 
 #: Container for topic + qos
 TopicQos = namedtuple("TopicQos", ["topic", "qos"])
-
 
 # Init logger
 logger = logging.getLogger(__name__)
 
 
-class Mqtt():
+class Mqtt:
     """Main Mqtt class.
 
     :param app:  flask application object
@@ -65,13 +62,12 @@ class Mqtt():
 
     """
 
-    def __init__(self, app=None, connect_async=False, mqtt_logging=False):
-        # type: (Flask, bool, bool) -> None
+    def __init__(self, app: Flask = None, connect_async: bool = False, mqtt_logging: bool = False) -> None:
         self.app = app
-        self._connect_async = connect_async  # type: bool
-        self._connect_handler = None  # type: Optional[Callable]
-        self._disconnect_handler = None  # type: Optional[Callable]
-        self.topics = {}  # type: Dict[str, TopicQos]
+        self._connect_async: bool = connect_async
+        self._connect_handler: Optional[Callable] = None
+        self._disconnect_handler: Optional[Callable] = None
+        self.topics: Dict[str, TopicQos] = {}
         self.connected = False
         self.client = Client()
         if mqtt_logging:
@@ -80,8 +76,7 @@ class Mqtt():
         if app is not None:
             self.init_app(app)
 
-    def init_app(self, app):
-        # type: (Flask) -> None
+    def init_app(self, app: Flask) -> None:
         """Init the Flask-MQTT addon."""
         self.client_id = app.config.get("MQTT_CLIENT_ID", "")
         self.clean_session = app.config.get("MQTT_CLEAN_SESSION", True)
@@ -130,9 +125,7 @@ class Mqtt():
 
         self._connect()
 
-    def _connect(self):
-        # type: () -> None
-
+    def _connect(self) -> None:
         if self.username is not None:
             self.client.username_pw_set(self.username, self.password)
 
@@ -163,7 +156,7 @@ class Mqtt():
             if res == 0:
                 logger.debug(
                     "Connected client '{0}' to broker {1}:{2}"
-                    .format(self.client_id, self.broker_url, self.broker_port)
+                        .format(self.client_id, self.broker_url, self.broker_port)
                 )
             else:
                 logger.error(
@@ -171,14 +164,12 @@ class Mqtt():
                 )
         self.client.loop_start()
 
-    def _disconnect(self):
-        # type: () -> None
+    def _disconnect(self) -> None:
         self.client.loop_stop()
         self.client.disconnect()
         logger.debug('Disconnected from Broker')
 
-    def _handle_connect(self, client, userdata, flags, rc):
-        # type: (Client, Any, Dict, int) -> None
+    def _handle_connect(self, client: Client, userdata: Any, flags: Dict[str, Any], rc: int) -> None:
         if rc == MQTT_ERR_SUCCESS:
             self.connected = True
             for key, item in self.topics.items():
@@ -186,14 +177,12 @@ class Mqtt():
         if self._connect_handler is not None:
             self._connect_handler(client, userdata, flags, rc)
 
-    def _handle_disconnect(self, client, userdata, rc):
-        # type: (str, Any, int) -> None
+    def _handle_disconnect(self, client: Client, userdata: Any, rc: int) -> None:
         self.connected = False
         if self._disconnect_handler is not None:
             self._disconnect_handler()
 
-    def on_topic(self, topic):
-        # type: (str) -> Callable
+    def on_topic(self, topic: str) -> Callable:
         """Decorator.
 
         Decorator to add a callback function that is called when a certain
@@ -218,15 +207,14 @@ class Mqtt():
                 print('Received message on topic {}: {}'
                       .format(message.topic, message.payload.decode()))
         """
-        def decorator(handler):
-            # type: (Callable[[str], None]) -> Callable[[str], None]
+
+        def decorator(handler: Callable[[str], None]) -> Callable[[str], None]:
             self.client.message_callback_add(topic, handler)
             return handler
 
         return decorator
 
-    def subscribe(self, topic, qos=0):
-        # type: (str, int) -> Tuple[int, int]
+    def subscribe(self, topic: str, qos: int = 0) -> Tuple[int, int]:
         """
         Subscribe to a certain topic.
 
@@ -268,10 +256,9 @@ class Mqtt():
             logger.error('Error {0} subscribing to topic: {1}'
                          .format(result, topic))
 
-        return (result, mid)
+        return result, mid
 
-    def unsubscribe(self, topic):
-        # type: (str) -> Optional[Tuple[int, int]]
+    def unsubscribe(self, topic: str) -> Optional[Tuple[int, int]]:
         """
         Unsubscribe from a single topic.
 
@@ -304,15 +291,14 @@ class Mqtt():
             return result, mid
         return None
 
-    def unsubscribe_all(self):
-        # type: () -> None
+    def unsubscribe_all(self) -> None:
         """Unsubscribe from all topics."""
         topics = list(self.topics.keys())
         for topic in topics:
             self.unsubscribe(topic)
 
-    def publish(self, topic, payload=None, qos=0, retain=False):
-        # type: (str, bytes, int, bool) -> Tuple[int, int]
+    def publish(self, topic: str, payload: Optional[bytes] = None, qos: int = 0, retain: bool = False) -> Tuple[
+        int, int]:
         """
         Send a message to the broker.
 
@@ -343,40 +329,37 @@ class Mqtt():
             logger.error('Error {0} publishing topic {1}'
                          .format(result, topic))
 
-        return (result, mid)
+        return result, mid
 
-    def on_connect(self):
-        # type: () -> Callable
+    def on_connect(self) -> Callable:
         """Decorator.
 
         Decorator to handle the event when the broker responds to a connection
         request. Only the last decorated function will be called.
 
         """
-        def decorator(handler):
-            # type: (Callable) -> Callable
+
+        def decorator(handler: Callable) -> Callable:
             self._connect_handler = handler
             return handler
 
         return decorator
 
-    def on_disconnect(self):
-        # type: () -> Callable
+    def on_disconnect(self) -> Callable:
         """Decorator.
 
         Decorator to handle the event when client disconnects from broker. Only
         the last decorated function will be called.
 
         """
-        def decorator(handler):
-            # type: (Callable) -> Callable
+
+        def decorator(handler: Callable) -> Callable:
             self._disconnect_handler = handler
             return handler
 
         return decorator
 
-    def on_message(self):
-        # type: () -> Callable
+    def on_message(self) -> Callable:
         """Decorator.
 
         Decorator to handle all messages that have been subscribed and that
@@ -393,15 +376,14 @@ class Mqtt():
                 print('Received message on topic {}: {}'
                       .format(message.topic, message.payload.decode()))
         """
-        def decorator(handler):
-            # type: (Callable) -> Callable
+
+        def decorator(handler: Callable) -> Callable:
             self.client.on_message = handler
             return handler
 
         return decorator
 
-    def on_publish(self):
-        # type: () -> Callable
+    def on_publish(self) -> Callable:
         """Decorator.
 
         Decorator to handle all messages that have been published by the
@@ -414,15 +396,14 @@ class Mqtt():
                 print('Published message with mid {}.'
                       .format(mid))
         """
-        def decorator(handler):
-            # type: (Callable) -> Callable
+
+        def decorator(handler: Callable) -> Callable:
             self.client.on_publish = handler
             return handler
 
         return decorator
 
-    def on_subscribe(self):
-        # type: () -> Callable
+    def on_subscribe(self) -> Callable:
         """Decorate a callback function to handle subscritions.
 
         **Usage:**::
@@ -432,15 +413,14 @@ class Mqtt():
                 print('Subscription id {} granted with qos {}.'
                       .format(mid, granted_qos))
         """
-        def decorator(handler):
-            # type: (Callable) -> Callable
+
+        def decorator(handler: Callable) -> Callable:
             self.client.on_subscribe = handler
             return handler
 
         return decorator
 
-    def on_unsubscribe(self):
-        # type: () -> Callable
+    def on_unsubscribe(self) -> Callable:
         """Decorate a callback funtion to handle unsubscribtions.
 
         **Usage:**::
@@ -450,15 +430,14 @@ class Mqtt():
                 print('Unsubscribed from topic (id: {})'
                       .format(mid)')
         """
-        def decorator(handler):
-            # type: (Callable) -> Callable
+
+        def decorator(handler: Callable) -> Callable:
             self.client.on_unsubscribe = handler
             return handler
 
         return decorator
 
-    def on_log(self):
-        # type: () -> Callable
+    def on_log(self) -> Callable:
         """Decorate a callback function to handle MQTT logging.
 
         **Example Usage:**
@@ -469,8 +448,8 @@ class Mqtt():
             def handle_logging(client, userdata, level, buf):
                 print(client, userdata, level, buf)
         """
-        def decorator(handler):
-            # type: (Callable) -> Callable
+
+        def decorator(handler: Callable) -> Callable:
             self.client.on_log = handler
             return handler
 
