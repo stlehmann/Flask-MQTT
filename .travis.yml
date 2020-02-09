@@ -17,10 +17,10 @@ python:
 # command to install dependencies
 install:
   - pip install -e .
-  - pip install coverage coveralls pytest-cov
+  - pip install coverage coveralls pytest-cov mypy
 
 script:
-  mosquitto -d && py.test -v --cov  flask_mqtt
+  bash deploy.sh
 
 after_success:
   coveralls
