@@ -212,8 +212,9 @@ class Mqtt:
 
             if res == 0:
                 logger.debug(
-                    "Connected client '{0}' to broker {1}:{2}"
-                        .format(self.client_id, self.broker_url, self.broker_port)
+                    "Connected client '{0}' to broker {1}:{2}".format(
+                        self.client_id, self.broker_url, self.broker_port
+                    )
                 )
             else:
                 logger.error(
@@ -224,9 +225,11 @@ class Mqtt:
     def _disconnect(self) -> None:
         self.client.loop_stop()
         self.client.disconnect()
-        logger.debug('Disconnected from Broker')
+        logger.debug("Disconnected from Broker")
 
-    def _handle_connect(self, client: Client, userdata: Any, flags: Dict[str, Any], rc: int) -> None:
+    def _handle_connect(
+        self, client: Client, userdata: Any, flags: Dict[str, Any], rc: int
+    ) -> None:
         if rc == MQTT_ERR_SUCCESS:
             self.connected = True
             for key, item in self.topics.items():
@@ -307,11 +310,9 @@ class Mqtt:
         # if successful add to topics
         if result == MQTT_ERR_SUCCESS:
             self.topics[topic] = TopicQos(topic=topic, qos=qos)
-            logger.debug('Subscribed to topic: {0}, qos: {1}'
-                         .format(topic, qos))
+            logger.debug("Subscribed to topic: {0}, qos: {1}".format(topic, qos))
         else:
-            logger.error('Error {0} subscribing to topic: {1}'
-                         .format(result, topic))
+            logger.error("Error {0} subscribing to topic: {1}".format(result, topic))
 
         return result, mid
 
@@ -339,10 +340,11 @@ class Mqtt:
 
             if result == MQTT_ERR_SUCCESS:
                 self.topics.pop(topic)
-                logger.debug('Unsubscribed from topic: {0}'.format(topic))
+                logger.debug("Unsubscribed from topic: {0}".format(topic))
             else:
-                logger.debug('Error {0} unsubscribing from topic: {1}'
-                             .format(result, topic))
+                logger.debug(
+                    "Error {0} unsubscribing from topic: {1}".format(result, topic)
+                )
 
             # if successful remove from topics
             return result, mid
@@ -354,8 +356,13 @@ class Mqtt:
         for topic in topics:
             self.unsubscribe(topic)
 
-    def publish(self, topic: str, payload: Optional[bytes] = None, qos: int = 0, retain: bool = False) -> Tuple[
-        int, int]:
+    def publish(
+        self,
+        topic: str,
+        payload: Optional[bytes] = None,
+        qos: int = 0,
+        retain: bool = False,
+    ) -> Tuple[int, int]:
         """
         Send a message to the broker.
 
@@ -381,10 +388,9 @@ class Mqtt:
 
         result, mid = self.client.publish(topic, payload, qos, retain)
         if result == MQTT_ERR_SUCCESS:
-            logger.debug('Published topic {0}: {1}'.format(topic, payload))
+            logger.debug("Published topic {0}: {1}".format(topic, payload))
         else:
-            logger.error('Error {0} publishing topic {1}'
-                         .format(result, topic))
+            logger.error("Error {0} publishing topic {1}".format(result, topic))
 
         return result, mid
 
