@@ -1,5 +1,10 @@
 Changelog
 =========
+Version 1.1.0 (unreleased)
+-------------
+* drop support for Python 2.7 and Python <= 3.5
+* use type-annotations and variable type annotations
+* include mypy type check in travis ci
 
 Version 1.0.7
 -------------

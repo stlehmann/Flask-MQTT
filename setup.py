@@ -45,6 +45,7 @@ else:
         long_description_content_type='text/markdown',
         packages=['flask_mqtt'],
         platforms='any',
+        python_requires=">=3.6",
         install_requires=[
             'Flask',
             'paho-mqtt'
