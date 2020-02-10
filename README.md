@@ -47,6 +47,13 @@ Simply install the package as usual via pip:
 $ pip install flask-mqtt
 ```
 
+Or with conda from the conda-forge channel:
+
+```bash
+$ conda config --add channels conda-forge
+$ conda install flask-mqtt
+```
+
 ## Usage
 
 ### Basic Setup
