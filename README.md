@@ -1,7 +1,7 @@
 # Flask-MQTT
 
 Flask Extension for the [MQTT protocol][1]. Basically it is a thin wrapper
-around [paho-mqtt][0] and aimes to simplify MQTT integration in Flask. MQTT is a
+around [paho-mqtt][0] and aims to simplify MQTT integration in Flask. MQTT is a
 machine-to-machine "Internet of Things" protocol and was designed for extremely
 lightweight publish/subscribe messaging transport.
 
