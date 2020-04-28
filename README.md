@@ -10,6 +10,8 @@ lightweight publish/subscribe messaging transport.
 [![Travis CI](https://travis-ci.org/stlehmann/Flask-MQTT.svg?branch=master)](https://travis-ci.org/stlehmann/Flask-MQTT)
 [![Coverage Status](https://coveralls.io/repos/github/stlehmann/Flask-MQTT/badge.svg?branch=master)](https://coveralls.io/github/stlehmann/Flask-MQTT?branch=master)
 [![Anaconda-Server Badge](https://anaconda.org/conda-forge/flask-mqtt/badges/installer/conda.svg)](https://conda.anaconda.org/conda-forge)
+[![Downloads](https://pepy.tech/badge/flask-mqtt)](https://pepy.tech/project/flask-mqtt)
+[![Downloads](https://pepy.tech/badge/flask-mqtt/week)](https://pepy.tech/project/flask-mqtt/week)
 
 Find the documentation on [http://flask-mqtt.readthedocs.io][2].
 
