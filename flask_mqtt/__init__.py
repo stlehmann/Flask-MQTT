@@ -383,9 +383,6 @@ class Mqtt:
                   ID for the publish request.
 
         """
-        if not self.connected:
-            self.client.reconnect()
-
         result, mid = self.client.publish(topic, payload, qos, retain)
         if result == MQTT_ERR_SUCCESS:
             logger.debug("Published topic {0}: {1}".format(topic, payload))

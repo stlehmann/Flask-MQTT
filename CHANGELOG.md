@@ -1,6 +1,7 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## 1.1.1 [unreleased]
@@ -10,6 +11,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Changed
 
 ### Removed
+* [#43](https://github.com/stlehmann/Flask-MQTT/issues/43) Remove reconnect for
+publish function. If you want to reconnect to server check the return value for
+MQTT_ERR_NO_CONN and call reconnect function.
 
 ## 1.1.0
 * drop support for Python 2.7 and Python <= 3.5
