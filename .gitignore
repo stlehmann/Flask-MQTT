@@ -90,6 +90,7 @@ ENV/
 *.sublime*
 doc/_build/*
 *.crt
+client.key
 .mypy_cache/*
 venv_*/
 
