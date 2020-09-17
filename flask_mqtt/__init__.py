@@ -105,6 +105,10 @@ class Mqtt:
 
     def init_app(self, app: Flask) -> None:
         """Init the Flask-MQTT addon."""
+        
+        if "MQTT_CLIENT_ID" in app.config:
+            self.client_id = app.config["MQTT_CLIENT_ID"]
+            
         if isinstance(self.client_id, unicode):
             self.client._client_id = self.client_id.encode("utf-8")
         else:
@@ -115,9 +119,6 @@ class Mqtt:
         self.client._clean_session = self.clean_session
         self.client.on_connect = self._handle_connect
         self.client.on_disconnect = self._handle_disconnect
-
-        if "MQTT_CLIENT_ID" in app.config:
-            self.client_id = app.config["MQTT_CLIENT_ID"]
 
         if "MQTT_CLEAN_SESSION" in app.config:
             self.clean_session = app.config["MQTT_CLEAN_SESSION"]
