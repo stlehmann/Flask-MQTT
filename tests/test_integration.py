@@ -125,6 +125,7 @@ class FlaskMQTTTestCase(unittest.TestCase):
         self.mqtt = Mqtt(self.app)
         self.handled_message = False
         self.handled_topic = False
+        self.connected = False
 
         @self.mqtt.on_message()
         def handle_message(client, userdata, message):
@@ -136,14 +137,19 @@ class FlaskMQTTTestCase(unittest.TestCase):
 
         @self.mqtt.on_connect()
         def handle_connect(*args, **kwargs):
+            self.connected = True
             self.mqtt.subscribe('home/test')
 
+        self.assertFalse(self.connected)
+        self.mqtt.init_app(self.app)
         wait()
         self.mqtt.publish('home/test', 'hello world')
         wait()
 
         self.assertFalse(self.handled_message)
         self.assertTrue(self.handled_topic)
+        self.assertTrue(self.connected)
+        self.mqtt._disconnect()
 
     def test_logging(self):
         self.mqtt = Mqtt(self.app)
