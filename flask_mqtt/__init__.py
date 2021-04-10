@@ -105,6 +105,7 @@ class Mqtt:
 
     def init_app(self, app: Flask) -> None:
         """Init the Flask-MQTT addon."""
+        self.app = app
         
         if "MQTT_CLIENT_ID" in app.config:
             self.client_id = app.config["MQTT_CLIENT_ID"]
