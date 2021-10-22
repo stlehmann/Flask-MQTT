@@ -1,6 +1,6 @@
-FROM ubuntu:xenial
+FROM python
 RUN apt-get update -y
-RUN apt-get install -y mosquitto python3 python3-pip
+RUN apt-get install -y mosquitto
 COPY . /app
 WORKDIR /app
 RUN pip3 install -e .
