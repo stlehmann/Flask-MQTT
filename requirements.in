@@ -1,0 +1,2 @@
+flask
+paho-mqtt
