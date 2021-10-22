@@ -7,7 +7,7 @@ lightweight publish/subscribe messaging transport.
 
 [![Documentation Status](https://readthedocs.org/projects/flask-mqtt/badge/?version=latest)](http://flask-mqtt.readthedocs.io/en/latest/?badge=latest)
 [![PyPI version](https://badge.fury.io/py/Flask-MQTT.svg)](https://badge.fury.io/py/Flask-MQTT)
-[![Travis CI](https://travis-ci.org/stlehmann/Flask-MQTT.svg?branch=master)](https://travis-ci.org/stlehmann/Flask-MQTT)
+[![CI](https://github.com/stlehmann/Flask-MQTT/actions/workflows/ci.yml/badge.svg)](https://github.com/stlehmann/Flask-MQTT/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/github/stlehmann/Flask-MQTT/badge.svg?branch=master)](https://coveralls.io/github/stlehmann/Flask-MQTT?branch=master)
 [![Anaconda-Server Badge](https://anaconda.org/conda-forge/flask-mqtt/badges/installer/conda.svg)](https://conda.anaconda.org/conda-forge)
 [![Downloads](https://pepy.tech/badge/flask-mqtt)](https://pepy.tech/project/flask-mqtt)
