@@ -29,8 +29,8 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        apt-get update -y
-        apt-get install -y mosquitto
+        sudo apt-get update -y
+        sudo apt-get install -y mosquitto
         python -m pip install --upgrade pip
         python -m pip install flake8 pytest coverage coveralls pytest-cov
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
