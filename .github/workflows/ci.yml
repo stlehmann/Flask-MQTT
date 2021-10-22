@@ -27,10 +27,13 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Install mosquitto
+      uses: awalsh128/cache-apt-pkgs-action@v1
+      with:
+        # Space delimited list of packages to install.
+        packages: mosquitto
     - name: Install dependencies
       run: |
-        sudo apt-get update -y
-        sudo apt-get install -y mosquitto
         python -m pip install --upgrade pip
         python -m pip install flake8 pytest coverage coveralls pytest-cov
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
