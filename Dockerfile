@@ -1,4 +1,4 @@
-FROM python
+FROM python:3.10
 RUN apt-get update -y
 RUN apt-get install -y mosquitto
 COPY . /app
