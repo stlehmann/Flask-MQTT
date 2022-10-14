@@ -38,7 +38,7 @@ jobs:
         pip install -e .        
     - name: Test with pytest
       run: |
-        mosquitto -d && py.test -v --cov  flask_mqtt
+        mosquitto -d && mosquitto -p 1885 -d && mosquitto -p 1886 && py.test -v --cov  flask_mqtt
     - name: Upload coverage result
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
