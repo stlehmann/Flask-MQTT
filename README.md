@@ -141,7 +141,7 @@ mqtt2 = Mqtt(app, config_prefix="MQTT2")
 
 # create third mqtt client for a different broker 
 app.config["MQTT3_broker_url"] = "example3.com"
-app.config["MQTT3_broker_port"] = 8883
+app.config["MQTT3_broker_port"] = 1885
 mqtt3 = Mqtt(app, config_prefix="MQTT3")
 ```
 
