@@ -13,7 +13,7 @@ except KeyError:
 from flask_mqtt import Mqtt, MQTT_ERR_SUCCESS
 
 
-def wait(seconds=5):
+def wait(seconds=0.5):
     time.sleep(seconds)
 
 
@@ -137,13 +137,11 @@ class FlaskMQTTTestCase(unittest.TestCase):
         @self.mqtt.on_connect()
         def handle_connect(*args, **kwargs):
             self.mqtt.subscribe('home/test')
-
-        wait()
-        self.mqtt.publish('home/test', 'hello world')
-        wait()
-
-        self.assertFalse(self.handled_message)
-        self.assertTrue(self.handled_topic)
+            wait()
+            self.mqtt.publish('home/test', 'hello world', qos=2)
+            wait()
+            self.assertFalse(self.handled_message)
+            self.assertTrue(self.handled_topic)
 
     def test_logging(self):
         self.mqtt = Mqtt(self.app)

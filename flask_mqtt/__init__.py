@@ -64,7 +64,7 @@ class Mqtt:
     """
 
     def __init__(
-        self, app: Flask = None, connect_async: bool = False, mqtt_logging: bool = False
+        self, app: Flask = None, connect_async: bool = False, mqtt_logging: bool = False, config_prefix: str = "MQTT"
     ) -> None:
         self._connect_async: bool = connect_async
         self._connect_handler: Optional[Callable] = None
@@ -77,6 +77,7 @@ class Mqtt:
 
         # configuration parameters
         self.client_id: str = ""
+        self.config_prefix = config_prefix
         self.clean_session: bool = True
         self.username: Optional[str] = None
         self.password: Optional[str] = None
@@ -101,75 +102,76 @@ class Mqtt:
             self.client.enable_logger(logger)
 
         if app is not None:
-            self.init_app(app)
+            self.init_app(app, self.config_prefix)
 
-    def init_app(self, app: Flask) -> None:
+    def init_app(self, app: Flask, config_prefix : str = "MQTT") -> None:
         """Init the Flask-MQTT addon."""
+        
+        if config_prefix + "_CLIENT_ID" in app.config:
+            self.client_id = app.config["MQTT_CLIENT_ID"]
+            
         if isinstance(self.client_id, unicode):
             self.client._client_id = self.client_id.encode("utf-8")
         else:
             self.client._client_id = self.client_id
 
-        self.client._transport = app.config.get("MQTT_TRANSPORT", "tcp").lower()
-        self.client._protocol = app.config.get("MQTT_PROTOCOL_VERSION", MQTTv311)
+        self.client._transport = app.config.get(config_prefix + "_TRANSPORT", "tcp").lower()
+        self.client._protocol = app.config.get(config_prefix + "_PROTOCOL_VERSION", MQTTv311)
         self.client._clean_session = self.clean_session
         self.client.on_connect = self._handle_connect
         self.client.on_disconnect = self._handle_disconnect
 
-        if "MQTT_CLIENT_ID" in app.config:
-            self.client_id = app.config["MQTT_CLIENT_ID"]
+        if config_prefix + "_CLEAN_SESSION" in app.config:
+            self.clean_session = app.config[config_prefix + "_CLEAN_SESSION"]
 
-        if "MQTT_CLEAN_SESSION" in app.config:
-            self.clean_session = app.config["MQTT_CLEAN_SESSION"]
+        if config_prefix + "_USERNAME" in app.config:
+            self.username = app.config[ config_prefix + "_USERNAME"]
 
-        if "MQTT_USERNAME" in app.config:
-            self.username = app.config["MQTT_USERNAME"]
+        if config_prefix + "_PASSWORD" in app.config:
+            self.password = app.config[config_prefix + "_PASSWORD"]
 
-        if "MQTT_PASSWORD" in app.config:
-            self.password = app.config["MQTT_PASSWORD"]
+        if config_prefix + "_BROKER_URL" in app.config:
+            self.broker_url = app.config[config_prefix + "_BROKER_URL"]
 
-        if "MQTT_BROKER_URL" in app.config:
-            self.broker_url = app.config["MQTT_BROKER_URL"]
+        if config_prefix + "_BROKER_PORT" in app.config:
+            self.broker_port = app.config[config_prefix + "_BROKER_PORT"]
 
-        if "MQTT_BROKER_PORT" in app.config:
-            self.broker_port = app.config["MQTT_BROKER_PORT"]
+        if config_prefix + "_TLS_ENABLED" in app.config:
+            self.tls_enabled = app.config[config_prefix + "_TLS_ENABLED"]
 
-        if "MQTT_TLS_ENABLED" in app.config:
-            self.tls_enabled = app.config["MQTT_TLS_ENABLED"]
+        if config_prefix + "_KEEPALIVE" in app.config:
+            self.keepalive = app.config[config_prefix + "_KEEPALIVE"]
 
-        if "MQTT_KEEPALIVE" in app.config:
-            self.keepalive = app.config["MQTT_KEEPALIVE"]
+        if config_prefix + "_LAST_WILL_TOPIC" in app.config:
+            self.last_will_topic = app.config[config_prefix + "_LAST_WILL_TOPIC"]
 
-        if "MQTT_LAST_WILL_TOPIC" in app.config:
-            self.last_will_topic = app.config["MQTT_LAST_WILL_TOPIC"]
+        if config_prefix + "_LAST_WILL_MESSAGE" in app.config:
+            self.last_will_message = app.config[config_prefix + "_LAST_WILL_MESSAGE"]
 
-        if "MQTT_LAST_WILL_MESSAGE" in app.config:
-            self.last_will_message = app.config["MQTT_LAST_WILL_MESSAGE"]
+        if config_prefix + "_LAST_WILL_QOS" in app.config:
+            self.last_will_qos = app.config[config_prefix + "_LAST_WILL_QOS"]
 
-        if "MQTT_LAST_WILL_QOS" in app.config:
-            self.last_will_qos = app.config["MQTT_LAST_WILL_QOS"]
-
-        if "MQTT_LAST_WILL_RETAIN" in app.config:
-            self.last_will_retain = app.config["MQTT_LAST_WILL_RETAIN"]
+        if config_prefix + "_LAST_WILL_RETAIN" in app.config:
+            self.last_will_retain = app.config[ config_prefix + "_LAST_WILL_RETAIN"]
 
         if self.tls_enabled:
-            if "MQTT_TLS_CA_CERTS" in app.config:
-                self.tls_ca_certs = app.config["MQTT_TLS_CA_CERTS"]
+            if config_prefix + "_TLS_CA_CERTS" in app.config:
+                self.tls_ca_certs = app.config[config_prefix + "_TLS_CA_CERTS"]
 
-            if "MQTT_TLS_CERTFILE" in app.config:
-                self.tls_certfile = app.config["MQTT_TLS_CERTFILE"]
+            if config_prefix + "_TLS_CERTFILE" in app.config:
+                self.tls_certfile = app.config[config_prefix + "_TLS_CERTFILE"]
 
-            if "MQTT_TLS_KEYFILE" in app.config:
-                self.tls_keyfile = app.config["MQTT_TLS_KEYFILE"]
+            if config_prefix + "_TLS_KEYFILE" in app.config:
+                self.tls_keyfile = app.config[config_prefix + "_TLS_KEYFILE"]
 
-            if "MQTT_TLS_CIPHERS" in app.config:
-                self.tls_ciphers = app.config["MQTT_TLS_CIPHERS"]
+            if config_prefix + "_TLS_CIPHERS" in app.config:
+                self.tls_ciphers = app.config[config_prefix + "_TLS_CIPHERS"]
 
-            if "MQTT_TLS_INSECURE" in app.config:
-                self.tls_insecure = app.config["MQTT_TLS_INSECURE"]
+            if config_prefix + "_TLS_INSECURE" in app.config:
+                self.tls_insecure = app.config[config_prefix + "_TLS_INSECURE"]
 
-            self.tls_cert_reqs = app.config.get("MQTT_TLS_CERT_REQS", ssl.CERT_REQUIRED)
-            self.tls_version = app.config.get("MQTT_TLS_VERSION", ssl.PROTOCOL_TLSv1)
+            self.tls_cert_reqs = app.config.get(config_prefix + "_TLS_CERT_REQS", ssl.CERT_REQUIRED)
+            self.tls_version = app.config.get(config_prefix + "_TLS_VERSION", ssl.PROTOCOL_TLSv1)
 
         # set last will message
         if self.last_will_topic is not None:

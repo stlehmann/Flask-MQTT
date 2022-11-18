@@ -7,7 +7,7 @@ lightweight publish/subscribe messaging transport.
 
 [![Documentation Status](https://readthedocs.org/projects/flask-mqtt/badge/?version=latest)](http://flask-mqtt.readthedocs.io/en/latest/?badge=latest)
 [![PyPI version](https://badge.fury.io/py/Flask-MQTT.svg)](https://badge.fury.io/py/Flask-MQTT)
-[![Travis CI](https://travis-ci.org/stlehmann/Flask-MQTT.svg?branch=master)](https://travis-ci.org/stlehmann/Flask-MQTT)
+[![CI](https://github.com/stlehmann/Flask-MQTT/actions/workflows/ci.yml/badge.svg)](https://github.com/stlehmann/Flask-MQTT/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/github/stlehmann/Flask-MQTT/badge.svg?branch=master)](https://coveralls.io/github/stlehmann/Flask-MQTT?branch=master)
 [![Anaconda-Server Badge](https://anaconda.org/conda-forge/flask-mqtt/badges/installer/conda.svg)](https://conda.anaconda.org/conda-forge)
 [![Downloads](https://pepy.tech/badge/flask-mqtt)](https://pepy.tech/project/flask-mqtt)
@@ -20,6 +20,7 @@ Find the documentation on [http://flask-mqtt.readthedocs.io][2].
 * configuration via Flask config variables
 * auto-connect on start of your web application
 * publish and subscribe messages
+* connect to multiple MQTT servers
 * use callbacks for certain topics
 * use one callback for all subscribed topics
 
@@ -121,6 +122,27 @@ To publish a message you can use the `publish()` method.
 
 ```python
 mqtt.publish('home/mytopic', 'this is my message')
+```
+
+### Connect to multiple MQTT Servers
+
+To connect to multiple servers, you can create multiple mqtt clients in your application by specifying the ```config_prefix``` when initializing ```Mqtt()```
+
+```python
+# default mqtt client
+app.config["MQTT_broker_url"] = "example.com"
+app.config["MQTT_broker_port"] = 8883
+mqtt = Mqtt(app)
+
+# create second mqtt client for a different broker 
+app.config["MQTT2_broker_url"] = "example2.com"
+app.config["MQTT_broker_port"] = 1883
+mqtt2 = Mqtt(app, config_prefix="MQTT2")
+
+# create third mqtt client for a different broker 
+app.config["MQTT3_broker_url"] = "example3.com"
+app.config["MQTT3_broker_port"] = 1885
+mqtt3 = Mqtt(app, config_prefix="MQTT3")
 ```
 
 ### Small publish/subscribe MQTT client
