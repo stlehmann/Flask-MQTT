@@ -276,7 +276,7 @@ class Mqtt:
 
         return decorator
 
-    def subscribe(self, topic: str, qos: int = 0) -> Tuple[int, int]:
+    def subscribe(self, topic, qos: int = 0) -> Tuple[int, int]:
         """
         Subscribe to a certain topic.
 
@@ -311,7 +311,12 @@ class Mqtt:
 
         # if successful add to topics
         if result == MQTT_ERR_SUCCESS:
-            self.topics[topic] = TopicQos(topic=topic, qos=qos)
+            if isinstance(topic, tuple):
+                topic, qos = topic
+                self.topics[topic] = TopicQos(topic=topic, qos=qos)
+            elif isinstance(topic, list):
+                for t, q in topic:
+                    self.topics[t] = TopicQos(topic=t, qos=q)
             logger.debug("Subscribed to topic: {0}, qos: {1}".format(topic, qos))
         else:
             logger.error("Error {0} subscribing to topic: {1}".format(result, topic))
