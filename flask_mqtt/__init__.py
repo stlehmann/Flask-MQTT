@@ -353,11 +353,20 @@ class Mqtt:
         return None
 
     def unsubscribe_all(self) -> None:
-        """Unsubscribe from all topics."""
+        """
+        Unsubscribe from all topics.
+        
+        Returns True if all topics are unsubscribed from self.topics, otherwise False 
+        
+        """
         topics = list(self.topics.keys())
         for topic in topics:
             self.unsubscribe(topic)
-
+        
+        if not len(self.topics):
+            return True
+        return False
+        
     def publish(
         self,
         topic: str,
