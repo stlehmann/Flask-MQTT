@@ -317,6 +317,8 @@ class Mqtt:
             elif isinstance(topic, list):
                 for t, q in topic:
                     self.topics[t] = TopicQos(topic=t, qos=q)
+            else:
+                self.topics[topic] = TopicQos(topic=topic, qos=qos)
             logger.debug("Subscribed to topic: {0}, qos: {1}".format(topic, qos))
         else:
             logger.error("Error {0} subscribing to topic: {1}".format(result, topic))
