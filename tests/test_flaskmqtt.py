@@ -31,7 +31,7 @@ class FlaskMQTTTestCase(unittest.TestCase):
         mqtt = Mqtt(self.app)
         self.assertIsNotNone(mqtt.app)
 
-    def test_late_initialization_app_not_none(self):
+    def test_late_initialization_app_is_not_none(self):
         mqtt = Mqtt()
         mqtt.init_app(self.app)
         self.assertIsNotNone(mqtt.app)
