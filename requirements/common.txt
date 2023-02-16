@@ -12,11 +12,13 @@ itsdangerous==1.1.0
     # via flask
 jinja2==2.10.1
     # via flask
-markupsafe==1.1.1
-    # via jinja2
+markupsafe==2.1.2
+    # via
+    #   jinja2
+    #   werkzeug
 paho-mqtt==1.4.0
     # via -r common.in
 typing==3.6.6
     # via -r common.in
-werkzeug==0.15.5
+werkzeug==2.2.3
     # via flask

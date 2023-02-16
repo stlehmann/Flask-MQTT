@@ -47,8 +47,10 @@ jinja2==2.10.1
     # via
     #   flask
     #   sphinx
-markupsafe==1.1.1
-    # via jinja2
+markupsafe==2.1.2
+    # via
+    #   jinja2
+    #   werkzeug
 more-itertools==7.0.0
     # via pytest
 mypy==0.701
@@ -134,5 +136,5 @@ virtualenv==16.4.3
     # via tox
 webencodings==0.5.1
     # via bleach
-werkzeug==0.15.5
+werkzeug==2.2.3
     # via flask
