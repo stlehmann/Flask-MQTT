@@ -6,17 +6,17 @@
 #
 click==8.0.3
     # via flask
-colorama==0.4.4
-    # via click
 flask==2.0.2
     # via -r requirements.in
 itsdangerous==2.0.1
     # via flask
 jinja2==3.0.2
     # via flask
-markupsafe==2.0.1
-    # via jinja2
+markupsafe==2.1.2
+    # via
+    #   jinja2
+    #   werkzeug
 paho-mqtt==1.6.1
     # via -r requirements.in
-werkzeug==2.0.2
+werkzeug==2.2.3
     # via flask
