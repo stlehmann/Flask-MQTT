@@ -7,7 +7,7 @@
 click==7.0
     # via flask
 flask==1.0.2
-    # via -r common.in
+    # via -r requirements/common.in
 itsdangerous==1.1.0
     # via flask
 jinja2==2.10.1
@@ -17,8 +17,8 @@ markupsafe==2.1.2
     #   jinja2
     #   werkzeug
 paho-mqtt==1.4.0
-    # via -r common.in
+    # via -r requirements/common.in
 typing==3.6.6
-    # via -r common.in
+    # via -r requirements/common.in
 werkzeug==2.2.3
     # via flask
