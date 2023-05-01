@@ -4,21 +4,23 @@
 #
 #    pip-compile --output-file common.txt common.in
 #
-click==7.0
+blinker==1.6.2
     # via flask
-flask==1.0.2
-    # via -r requirements/common.in
-itsdangerous==1.1.0
+click==8.1.3
     # via flask
-jinja2==2.10.1
+flask==2.3.2
+    # via -r common.in
+itsdangerous==2.1.2
+    # via flask
+jinja2==3.1.2
     # via flask
 markupsafe==2.1.2
     # via
     #   jinja2
     #   werkzeug
 paho-mqtt==1.4.0
-    # via -r requirements/common.in
+    # via -r common.in
 typing==3.6.6
-    # via -r requirements/common.in
-werkzeug==2.2.3
+    # via -r common.in
+werkzeug==2.3.3
     # via flask
