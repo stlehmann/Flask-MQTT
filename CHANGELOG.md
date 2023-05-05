@@ -22,7 +22,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 * Function enhancement for [`unsubscribe_all()`](https://github.com/stlehmann/Flask-MQTT/commit/e86a22084138ee7615e46c951ad01647a2db0315)
 
-* [Fixed topic population in subscribe() for tuple/list type topics] (https://github.com/stlehmann/Flask-MQTT/commit/9d6c2e99db769476f08a3c6cfdaf9bbc6ddca2f2)
+* [Fixed topic population in subscribe() for tuple/list type topics](https://github.com/stlehmann/Flask-MQTT/commit/9d6c2e99db769476f08a3c6cfdaf9bbc6ddca2f2)
 
 * [correction on init_app()](https://github.com/stlehmann/Flask-MQTT/commit/f889437de6a1cbef2cde093c1f94d3785a43d179)
     
