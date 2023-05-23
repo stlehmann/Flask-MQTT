@@ -24,11 +24,11 @@ click==8.1.3
     # via flask
 coverage==4.5.3
     # via
-    #   -r development.in
+    #   -r requirements/development.in
     #   coveralls
     #   pytest-cov
 coveralls==1.7.0
-    # via -r development.in
+    # via -r requirements/development.in
 docopt==0.6.2
     # via coveralls
 docutils==0.14
@@ -38,7 +38,7 @@ docutils==0.14
 filelock==3.0.10
     # via tox
 flask==2.3.2
-    # via -r common.in
+    # via -r requirements/common.in
 idna==2.8
     # via requests
 imagesize==1.1.0
@@ -56,13 +56,13 @@ markupsafe==2.1.2
 more-itertools==7.0.0
     # via pytest
 mypy==0.701
-    # via -r development.in
+    # via -r requirements/development.in
 mypy-extensions==0.4.1
     # via mypy
 packaging==19.0
     # via sphinx
 paho-mqtt==1.4.0
-    # via -r common.in
+    # via -r requirements/common.in
 pkginfo==1.5.0.1
     # via twine
 pluggy==0.9.0
@@ -81,10 +81,10 @@ pyparsing==2.4.0
     # via packaging
 pytest==4.4.1
     # via
-    #   -r development.in
+    #   -r requirements/development.in
     #   pytest-cov
 pytest-cov==2.6.1
-    # via -r development.in
+    # via -r requirements/development.in
 pytz==2019.1
     # via babel
 readme-renderer==24.0
@@ -107,7 +107,7 @@ six==1.12.0
 snowballstemmer==1.2.1
     # via sphinx
 sphinx==2.0.1
-    # via -r development.in
+    # via -r requirements/development.in
 sphinxcontrib-applehelp==1.0.1
     # via sphinx
 sphinxcontrib-devhelp==1.0.1
@@ -123,15 +123,15 @@ sphinxcontrib-serializinghtml==1.1.3
 toml==0.10.0
     # via tox
 tox==3.9.0
-    # via -r development.in
+    # via -r requirements/development.in
 tqdm==4.31.1
     # via twine
 twine==1.13.0
-    # via -r development.in
+    # via -r requirements/development.in
 typed-ast==1.3.4
     # via mypy
 typing==3.6.6
-    # via -r common.in
+    # via -r requirements/common.in
 urllib3==1.24.2
     # via requests
 virtualenv==16.4.3
