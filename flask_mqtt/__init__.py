@@ -45,7 +45,7 @@ if sys.version_info[0] >= 3:
     unicode = str
 
 # current Flask-MQTT version
-__version__ = "1.1.1"
+__version__ = "1.1.2"
 
 #: Container for topic + qos
 TopicQos = namedtuple("TopicQos", ["topic", "qos"])
