@@ -118,14 +118,14 @@ class Mqtt:
         else:
             self.client._client_id = self.client_id
 
+        if config_prefix + "_CLEAN_SESSION" in app.config:
+            self.clean_session = app.config[config_prefix + "_CLEAN_SESSION"]
+
         self.client._transport = app.config.get(config_prefix + "_TRANSPORT", "tcp").lower()
         self.client._protocol = app.config.get(config_prefix + "_PROTOCOL_VERSION", MQTTv311)
         self.client._clean_session = self.clean_session
         self.client.on_connect = self._handle_connect
         self.client.on_disconnect = self._handle_disconnect
-
-        if config_prefix + "_CLEAN_SESSION" in app.config:
-            self.clean_session = app.config[config_prefix + "_CLEAN_SESSION"]
 
         if config_prefix + "_USERNAME" in app.config:
             self.username = app.config[ config_prefix + "_USERNAME"]
