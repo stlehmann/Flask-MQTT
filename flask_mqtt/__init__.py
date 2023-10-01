@@ -45,7 +45,7 @@ if sys.version_info[0] >= 3:
     unicode = str
 
 # current Flask-MQTT version
-__version__ = "1.1.1"
+__version__ = "1.2.0"
 
 #: Container for topic + qos
 TopicQos = namedtuple("TopicQos", ["topic", "qos"])
@@ -106,6 +106,9 @@ class Mqtt:
 
     def init_app(self, app: Flask, config_prefix : str = "MQTT") -> None:
         """Init the Flask-MQTT addon."""
+        
+        if self.app is None:
+            self.app = app
         
         if config_prefix + "_CLIENT_ID" in app.config:
             self.client_id = app.config["MQTT_CLIENT_ID"]
@@ -276,7 +279,7 @@ class Mqtt:
 
         return decorator
 
-    def subscribe(self, topic: str, qos: int = 0) -> Tuple[int, int]:
+    def subscribe(self, topic, qos: int = 0) -> Tuple[int, int]:
         """
         Subscribe to a certain topic.
 
@@ -311,7 +314,14 @@ class Mqtt:
 
         # if successful add to topics
         if result == MQTT_ERR_SUCCESS:
-            self.topics[topic] = TopicQos(topic=topic, qos=qos)
+            if isinstance(topic, tuple):
+                topic, qos = topic
+                self.topics[topic] = TopicQos(topic=topic, qos=qos)
+            elif isinstance(topic, list):
+                for t, q in topic:
+                    self.topics[t] = TopicQos(topic=t, qos=q)
+            else:
+                self.topics[topic] = TopicQos(topic=topic, qos=qos)
             logger.debug("Subscribed to topic: {0}, qos: {1}".format(topic, qos))
         else:
             logger.error("Error {0} subscribing to topic: {1}".format(result, topic))
@@ -353,11 +363,20 @@ class Mqtt:
         return None
 
     def unsubscribe_all(self) -> None:
-        """Unsubscribe from all topics."""
+        """
+        Unsubscribe from all topics.
+        
+        Returns True if all topics are unsubscribed from self.topics, otherwise False 
+        
+        """
         topics = list(self.topics.keys())
         for topic in topics:
             self.unsubscribe(topic)
-
+        
+        if not len(self.topics):
+            return True
+        return False
+        
     def publish(
         self,
         topic: str,
