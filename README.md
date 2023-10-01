@@ -146,6 +146,9 @@ mqtt3 = Mqtt(app, config_prefix="MQTT3")
 ```
 
 ### Small publish/subscribe MQTT client
+Note: if you want to enable ssl transport layer on the mqtt communication
+take a look at the commented sections in the example file.
+You may need to add or replace some of the MQTT_TLS options and adjust to your needs.
 
 ```python
 """
@@ -160,6 +163,8 @@ from flask import Flask, render_template
 from flask_mqtt import Mqtt
 from flask_socketio import SocketIO
 from flask_bootstrap import Bootstrap
+# if SSL enabled
+# from flask_mqtt import ssl
 
 eventlet.monkey_patch()
 
@@ -179,6 +184,17 @@ app.config['MQTT_CLEAN_SESSION'] = True
 # app.config['MQTT_TLS_ENABLED'] = True
 # app.config['MQTT_TLS_INSECURE'] = True
 # app.config['MQTT_TLS_CA_CERTS'] = 'ca.crt'
+
+# Parmeters for SSL with client certificate
+# app.config['MQTT_TLS_ENABLED']   = True
+# app.config['MQTT_BROKER_URL']    = 'test.mosquitto.org'
+# app.config['MQTT_BROKER_PORT']   = 8884
+# app.config['MQTT_TLS_INSECURE']  = False
+# app.config['MQTT_TLS_CA_CERTS']  = 'mosquitto.org.crt'
+# app.config['MQTT_TLS_CERTFILE']  = 'client.crt'
+# app.config['MQTT_TLS_KEYFILE']   = 'client.key'
+# app.config['MQTT_TLS_VERSION']   = ssl.PROTOCOL_TLSv1_2
+# app.config['MQTT_TLS_CERT_REQS'] = True
 
 mqtt = Mqtt(app)
 socketio = SocketIO(app)
