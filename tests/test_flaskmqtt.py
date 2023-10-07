@@ -42,7 +42,7 @@ class FlaskMQTTTestCase(unittest.TestCase):
         self.app.config['MQTT_BROKER_URL'] = 'broker_url'
         self.app.config['MQTT_BROKER_PORT'] = 'broker_port'
         self.app.config['MQTT_TLS_ENABLED'] = 'tls_enabled'
-        self.app.config['MQTT_CLEAN_SESSION'] = True
+        self.app.config['MQTT_CLEAN_SESSION'] = False
         self.app.config['MQTT_KEEPALIVE'] = 'keepalive'
         self.app.config['MQTT_LAST_WILL_TOPIC'] = 'home/lastwill'
         self.app.config['MQTT_LAST_WILL_MESSAGE'] = 'last will'
@@ -63,7 +63,7 @@ class FlaskMQTTTestCase(unittest.TestCase):
         self.assertEqual('broker_url', mqtt.broker_url)
         self.assertEqual('broker_port', mqtt.broker_port)
         self.assertEqual('tls_enabled', mqtt.tls_enabled)
-        self.assertEqual(True, mqtt.clean_session)
+        self.assertEqual(False, mqtt.clean_session)
         self.assertEqual('keepalive', mqtt.keepalive)
         self.assertEqual('home/lastwill', mqtt.last_will_topic)
         self.assertEqual('last will', mqtt.last_will_message)
