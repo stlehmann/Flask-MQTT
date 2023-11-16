@@ -138,5 +138,5 @@ virtualenv==16.4.3
     # via tox
 webencodings==0.5.1
     # via bleach
-werkzeug==2.3.3
+werkzeug==3.0.1
     # via flask
