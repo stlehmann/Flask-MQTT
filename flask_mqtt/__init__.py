@@ -71,7 +71,16 @@ class Mqtt:
         self._disconnect_handler: Optional[Callable] = None
 
         self.app = app
-        self.client = Client()
+
+        try:
+            # paho-mqtt >=2.0.0 needs the CallbackAPIVersion parameter.
+            # https://eclipse.dev/paho/files/paho.mqtt.python/html/migrations.html
+            # Calling Client() without it leeds to: AttributeError: 'Client' object has no attribute '_sock'
+            from paho.mqtt.client import CallbackAPIVersion
+            self.client = Client(CallbackAPIVersion.VERSION1)
+        except ImportError:
+            self.client = Client()
+            
         self.connected = False
         self.topics: Dict[str, TopicQos] = {}
 
