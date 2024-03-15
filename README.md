@@ -12,6 +12,7 @@ lightweight publish/subscribe messaging transport.
 [![Anaconda-Server Badge](https://anaconda.org/conda-forge/flask-mqtt/badges/installer/conda.svg)](https://conda.anaconda.org/conda-forge)
 [![Downloads](https://pepy.tech/badge/flask-mqtt)](https://pepy.tech/project/flask-mqtt)
 [![Downloads](https://pepy.tech/badge/flask-mqtt/week)](https://pepy.tech/project/flask-mqtt/week)
+[![Inactively Maintained](https://img.shields.io/badge/Maintenance%20Level-Inactively%20Maintained-yellowgreen.svg)](https://gist.github.com/cheerfulstoic/d107229326a01ff0f333a1d3476e068d)
 
 Find the documentation on [http://flask-mqtt.readthedocs.io][2].
 
