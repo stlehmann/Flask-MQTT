@@ -39,6 +39,7 @@ from paho.mqtt.client import (
     MQTTv311,
     MQTTv31,
 )
+from paho.mqtt.enums import CallbackAPIVersion
 
 # define some alias for python2 compatibility
 if sys.version_info[0] >= 3:
@@ -71,7 +72,7 @@ class Mqtt:
         self._disconnect_handler: Optional[Callable] = None
 
         self.app = app
-        self.client = Client()
+        self.client = Client(callback_api_version=CallbackAPIVersion.VERSION1)
         self.connected = False
         self.topics: Dict[str, TopicQos] = {}
 
