@@ -124,7 +124,7 @@ toml==0.10.0
     # via tox
 tox==3.9.0
     # via -r development.in
-tqdm==4.31.1
+tqdm==4.66.3
     # via twine
 twine==1.13.0
     # via -r development.in
