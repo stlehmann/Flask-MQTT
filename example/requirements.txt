@@ -1,4 +1,4 @@
-certifi==2023.7.22
+certifi==2024.7.4
 Click==7.0
 dnspython==1.16.0
 dominate==2.4.0
