@@ -245,7 +245,7 @@ class Mqtt:
     def _handle_disconnect(self, client: Client, userdata: Any, rc: int) -> None:
         self.connected = False
         if self._disconnect_handler is not None:
-            self._disconnect_handler()
+            self._disconnect_handler(client, userdata, rc)
 
     def on_topic(self, topic: str) -> Callable:
         """Decorator.
