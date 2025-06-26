@@ -39,7 +39,7 @@ filelock==3.0.10
     # via tox
 flask==2.3.2
     # via -r common.in
-idna==2.8
+idna==3.7
     # via requests
 imagesize==1.1.0
     # via sphinx
