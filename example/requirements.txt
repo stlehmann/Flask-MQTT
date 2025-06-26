@@ -1,6 +1,6 @@
 certifi==2023.7.22
 Click==7.0
-dnspython==1.16.0
+dnspython==2.6.1
 dominate==2.4.0
 eventlet==0.25.1
 Flask==2.3.2
