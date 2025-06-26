@@ -2,7 +2,7 @@ certifi==2023.7.22
 Click==7.0
 dnspython==1.16.0
 dominate==2.4.0
-eventlet==0.25.1
+eventlet==0.35.2
 Flask==2.3.2
 Flask-Bootstrap==3.3.7.1
 Flask-MQTT==1.0.5
