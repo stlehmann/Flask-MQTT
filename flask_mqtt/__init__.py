@@ -109,6 +109,14 @@ class Mqtt:
         
         if self.app is None:
             self.app = app
+
+        if 'mqtt' in app.extensions:
+            raise RuntimeError(
+                "A 'MQTT' instance has already been registered on this Flask app."
+                " Import and use that instance instead."
+            )
+
+        app.extensions['mqtt'] = self
         
         if config_prefix + "_CLIENT_ID" in app.config:
             self.client_id = app.config["MQTT_CLIENT_ID"]
