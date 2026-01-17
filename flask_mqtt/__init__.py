@@ -71,7 +71,14 @@ class Mqtt:
         self._disconnect_handler: Optional[Callable] = None
 
         self.app = app
-        self.client = Client()
+        # paho-mqtt >=2.0.0 requires selecting the callback API version.
+        # Opt into VERSION1 for backward-compatible callback signatures.
+        try:
+            from paho.mqtt.client import CallbackAPIVersion
+            self.client = Client(CallbackAPIVersion.VERSION1)
+        except ImportError:
+            # For paho-mqtt <2.0.0 where CallbackAPIVersion does not exist.
+            self.client = Client()
         self.connected = False
         self.topics: Dict[str, TopicQos] = {}
 
@@ -121,9 +128,19 @@ class Mqtt:
         if config_prefix + "_CLEAN_SESSION" in app.config:
             self.clean_session = app.config[config_prefix + "_CLEAN_SESSION"]
 
-        self.client._transport = app.config.get(config_prefix + "_TRANSPORT", "tcp").lower()
-        self.client._protocol = app.config.get(config_prefix + "_PROTOCOL_VERSION", MQTTv311)
-        self.client._clean_session = self.clean_session
+        # Set transport/protocol/clean_session with forward-compatibility for paho-mqtt 2.x
+        transport_value = app.config.get(config_prefix + "_TRANSPORT", "tcp").lower()
+        protocol_value = app.config.get(config_prefix + "_PROTOCOL_VERSION", MQTTv311)
+        try:
+            # paho-mqtt 2.x exposes properties
+            self.client.transport = transport_value
+            self.client.protocol = protocol_value
+            self.client.clean_session = self.clean_session
+        except AttributeError:
+            # fall back to older private attributes for 1.x
+            self.client._transport = transport_value
+            self.client._protocol = protocol_value
+            self.client._clean_session = self.clean_session
         self.client.on_connect = self._handle_connect
         self.client.on_disconnect = self._handle_disconnect
 

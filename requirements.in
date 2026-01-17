@@ -1,2 +1,2 @@
 flask
-paho-mqtt<2.0
+paho-mqtt
