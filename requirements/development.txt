@@ -4,142 +4,180 @@
 #
 #    pip-compile --output-file=development.txt development.in
 #
-alabaster==0.7.12
+alabaster==1.0.0
     # via sphinx
-atomicwrites==1.3.0
-    # via pytest
-attrs==19.1.0
-    # via pytest
-babel==2.6.0
+babel==2.17.0
     # via sphinx
-bleach==3.1.4
-    # via readme-renderer
-blinker==1.6.2
+blinker==1.9.0
     # via flask
-certifi==2023.7.22
+cachetools==6.2.4
+    # via tox
+certifi==2026.1.4
     # via requests
-charset-normalizer==3.1.0
+cffi==2.0.0
+    # via cryptography
+chardet==5.2.0
+    # via tox
+charset-normalizer==3.4.4
     # via requests
-click==8.1.3
+click==8.3.1
     # via flask
-coverage==4.5.3
+colorama==0.4.6
+    # via tox
+coverage[toml]==7.13.1
     # via
     #   -r development.in
     #   coveralls
     #   pytest-cov
-coveralls==1.7.0
+coveralls==4.0.2
     # via -r development.in
+cryptography==46.0.3
+    # via secretstorage
+distlib==0.4.0
+    # via virtualenv
 docopt==0.6.2
     # via coveralls
-docutils==0.14
+docutils==0.22.4
     # via
     #   readme-renderer
     #   sphinx
-filelock==3.0.10
-    # via tox
-flask==2.3.2
+filelock==3.20.3
+    # via
+    #   tox
+    #   virtualenv
+flask==3.1.2
     # via -r common.in
-idna==2.8
+id==1.5.0
+    # via twine
+idna==3.11
     # via requests
-imagesize==1.1.0
+imagesize==1.4.1
     # via sphinx
-itsdangerous==2.1.2
+iniconfig==2.3.0
+    # via pytest
+itsdangerous==2.2.0
     # via flask
-jinja2==3.1.3
+jaraco-classes==3.4.0
+    # via keyring
+jaraco-context==6.1.0
+    # via keyring
+jaraco-functools==4.4.0
+    # via keyring
+jeepney==0.9.0
+    # via
+    #   keyring
+    #   secretstorage
+jinja2==3.1.6
     # via
     #   flask
     #   sphinx
-markupsafe==2.1.2
+keyring==25.7.0
+    # via twine
+librt==0.7.8
+    # via mypy
+markdown-it-py==4.0.0
+    # via rich
+markupsafe==3.0.3
     # via
+    #   flask
     #   jinja2
     #   werkzeug
-more-itertools==7.0.0
-    # via pytest
-mypy==0.701
+mdurl==0.1.2
+    # via markdown-it-py
+more-itertools==10.8.0
+    # via
+    #   jaraco-classes
+    #   jaraco-functools
+mypy==1.19.1
     # via -r development.in
-mypy-extensions==0.4.1
+mypy-extensions==1.1.0
     # via mypy
-packaging==19.0
-    # via sphinx
-paho-mqtt==1.4.0
-    # via -r common.in
-pkginfo==1.5.0.1
-    # via twine
-pluggy==0.9.0
+nh3==0.3.2
+    # via readme-renderer
+packaging==25.0
     # via
+    #   pyproject-api
     #   pytest
-    #   tox
-py==1.8.0
-    # via
-    #   pytest
-    #   tox
-pygments==2.15.0
-    # via
-    #   readme-renderer
     #   sphinx
-pyparsing==2.4.0
-    # via packaging
-pytest==4.4.1
+    #   tox
+    #   twine
+paho-mqtt==2.1.0
+    # via -r common.in
+pathspec==1.0.3
+    # via mypy
+platformdirs==4.5.1
+    # via
+    #   tox
+    #   virtualenv
+pluggy==1.6.0
+    # via
+    #   pytest
+    #   pytest-cov
+    #   tox
+pycparser==2.23
+    # via cffi
+pygments==2.19.2
+    # via
+    #   pytest
+    #   readme-renderer
+    #   rich
+    #   sphinx
+pyproject-api==1.10.0
+    # via tox
+pytest==9.0.2
     # via
     #   -r development.in
     #   pytest-cov
-pytest-cov==2.6.1
+pytest-cov==7.0.0
     # via -r development.in
-pytz==2019.1
-    # via babel
-readme-renderer==24.0
+readme-renderer==44.0
     # via twine
-requests==2.31.0
+requests==2.32.5
     # via
     #   coveralls
+    #   id
     #   requests-toolbelt
     #   sphinx
     #   twine
-requests-toolbelt==0.9.1
+requests-toolbelt==1.0.0
     # via twine
-six==1.12.0
-    # via
-    #   bleach
-    #   packaging
-    #   pytest
-    #   readme-renderer
-    #   tox
-snowballstemmer==1.2.1
+rfc3986==2.0.0
+    # via twine
+rich==14.2.0
+    # via twine
+roman-numerals==4.1.0
     # via sphinx
-sphinx==2.0.1
+secretstorage==3.5.0
+    # via keyring
+snowballstemmer==3.0.1
+    # via sphinx
+sphinx==9.1.0
     # via -r development.in
-sphinxcontrib-applehelp==1.0.1
+sphinxcontrib-applehelp==2.0.0
     # via sphinx
-sphinxcontrib-devhelp==1.0.1
+sphinxcontrib-devhelp==2.0.0
     # via sphinx
-sphinxcontrib-htmlhelp==1.0.2
+sphinxcontrib-htmlhelp==2.1.0
     # via sphinx
 sphinxcontrib-jsmath==1.0.1
     # via sphinx
-sphinxcontrib-qthelp==1.0.2
+sphinxcontrib-qthelp==2.0.0
     # via sphinx
-sphinxcontrib-serializinghtml==1.1.3
+sphinxcontrib-serializinghtml==2.0.0
     # via sphinx
-toml==0.10.0
-    # via tox
-tox==3.9.0
+tox==4.34.1
     # via -r development.in
-tqdm==4.31.1
-    # via twine
-twine==1.13.0
+twine==6.2.0
     # via -r development.in
-typed-ast==1.3.4
-    # via mypy
-typing==3.6.6
+typing==3.7.4.3
     # via -r common.in
-urllib3==1.26.18
-    # via requests
-virtualenv==16.4.3
+typing-extensions==4.15.0
+    # via mypy
+urllib3==2.6.3
+    # via
+    #   requests
+    #   twine
+virtualenv==20.36.1
     # via tox
-webencodings==0.5.1
-    # via bleach
-werkzeug==3.0.1
+werkzeug==3.1.5
     # via flask
-
-# The following packages are considered to be unsafe in a requirements file:
-# setuptools
