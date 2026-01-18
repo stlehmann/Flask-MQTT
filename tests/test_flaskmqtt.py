@@ -1,6 +1,5 @@
 import sys
 import unittest
-from enum import Enum
 
 try:
     from unittest.mock import MagicMock
@@ -9,16 +8,17 @@ except ImportError:
 
 from flask import Flask
 
-
-# Create a proper CallbackAPIVersion enum for mocking
-class CallbackAPIVersion(Enum):
-    VERSION1 = 1
-    VERSION2 = 2
-
+# Import the real CallbackAPIVersion from paho-mqtt if available
+try:
+    from paho.mqtt.client import CallbackAPIVersion as RealCallbackAPIVersion
+    has_callback_api_version = True
+except ImportError:
+    has_callback_api_version = False
 
 # apply mock
 mock_mqtt = MagicMock()
-mock_mqtt.CallbackAPIVersion = CallbackAPIVersion
+if has_callback_api_version:
+    mock_mqtt.CallbackAPIVersion = RealCallbackAPIVersion
 sys.modules['paho.mqtt.client'] = mock_mqtt
 try:
     sys.modules.pop('flask_mqtt')
@@ -34,7 +34,8 @@ class FlaskMQTTTestCase(unittest.TestCase):
 
     def setUp(self):
         mock_mqtt = MagicMock()
-        mock_mqtt.CallbackAPIVersion = CallbackAPIVersion
+        if has_callback_api_version:
+            mock_mqtt.CallbackAPIVersion = RealCallbackAPIVersion
         sys.modules['paho.mqtt.client'] = mock_mqtt
         self.app = Flask(__name__)
 
