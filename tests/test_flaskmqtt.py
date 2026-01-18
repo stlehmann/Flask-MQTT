@@ -135,6 +135,79 @@ class FlaskMQTTTestCase(unittest.TestCase):
         # Check that tls_insecure_set was called with True
         mqtt.client.tls_insecure_set.assert_called_with(True)
 
+    def test_on_disconnect_handler_receives_parameters(self):
+        """Test that disconnect handler receives client, userdata, and rc parameters."""
+        mqtt = Mqtt(self.app)
+        
+        # Create a mock handler
+        mock_handler = MagicMock()
+        
+        # Register the handler using decorator
+        @mqtt.on_disconnect()
+        def handle_disconnect(client, userdata, rc):
+            mock_handler(client, userdata, rc)
+        
+        # Simulate a disconnect event
+        mock_client = MagicMock()
+        mock_userdata = {'test': 'data'}
+        mock_rc = 0
+        
+        mqtt._handle_disconnect(mock_client, mock_userdata, mock_rc)
+        
+        # Verify the handler was called with the correct parameters
+        mock_handler.assert_called_once_with(mock_client, mock_userdata, mock_rc)
+
+    def test_on_disconnect_handler_not_called_when_none(self):
+        """Test that no error occurs when disconnect happens without a handler."""
+        mqtt = Mqtt(self.app)
+        
+        # Simulate a disconnect event without a registered handler
+        mock_client = MagicMock()
+        mock_userdata = {'test': 'data'}
+        mock_rc = 0
+        
+        # This should not raise an error
+        mqtt._handle_disconnect(mock_client, mock_userdata, mock_rc)
+        
+        # Verify connected status is updated
+        self.assertFalse(mqtt.connected)
+
+    def test_on_disconnect_sets_connected_to_false(self):
+        """Test that _handle_disconnect sets connected to False."""
+        mqtt = Mqtt(self.app)
+        mqtt.connected = True
+        
+        mock_client = MagicMock()
+        mock_userdata = None
+        mock_rc = 0
+        
+        mqtt._handle_disconnect(mock_client, mock_userdata, mock_rc)
+        
+        self.assertFalse(mqtt.connected)
+
+    def test_on_connect_handler_receives_parameters(self):
+        """Test that connect handler receives client, userdata, flags, and rc parameters."""
+        mqtt = Mqtt(self.app)
+        
+        # Create a mock handler
+        mock_handler = MagicMock()
+        
+        # Register the handler using decorator
+        @mqtt.on_connect()
+        def handle_connect(client, userdata, flags, rc):
+            mock_handler(client, userdata, flags, rc)
+        
+        # Simulate a successful connect event
+        mock_client = MagicMock()
+        mock_userdata = {'test': 'data'}
+        mock_flags = {'session present': 0}
+        mock_rc = 0  # MQTT_ERR_SUCCESS
+        
+        mqtt._handle_connect(mock_client, mock_userdata, mock_flags, mock_rc)
+        
+        # Verify the handler was called with the correct parameters
+        mock_handler.assert_called_once_with(mock_client, mock_userdata, mock_flags, mock_rc)
+
 
 if __name__ == '__main__':
     unittest.main()
