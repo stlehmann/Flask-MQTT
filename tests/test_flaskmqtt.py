@@ -1,5 +1,6 @@
 import sys
 import unittest
+from enum import Enum
 
 try:
     from unittest.mock import MagicMock
@@ -9,8 +10,16 @@ except ImportError:
 from flask import Flask
 
 
+# Create a proper CallbackAPIVersion enum for mocking
+class CallbackAPIVersion(Enum):
+    VERSION1 = 1
+    VERSION2 = 2
+
+
 # apply mock
-sys.modules['paho.mqtt.client'] = MagicMock()
+mock_mqtt = MagicMock()
+mock_mqtt.CallbackAPIVersion = CallbackAPIVersion
+sys.modules['paho.mqtt.client'] = mock_mqtt
 try:
     sys.modules.pop('flask_mqtt')
 except KeyError:
@@ -24,7 +33,9 @@ Mqtt = flask_mqtt.Mqtt
 class FlaskMQTTTestCase(unittest.TestCase):
 
     def setUp(self):
-        sys.modules['paho.mqtt.client'] = MagicMock()
+        mock_mqtt = MagicMock()
+        mock_mqtt.CallbackAPIVersion = CallbackAPIVersion
+        sys.modules['paho.mqtt.client'] = mock_mqtt
         self.app = Flask(__name__)
 
     def test_early_initialization_app_is_not_none(self):
