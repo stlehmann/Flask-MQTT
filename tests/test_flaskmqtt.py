@@ -81,7 +81,7 @@ class FlaskMQTTTestCase(unittest.TestCase):
         mqtt.client.username_pw_set.assert_called_once_with('username',
                                                             'password')
 
-        mqtt.client.tls_set.called_once_with(
+        mqtt.client.tls_set.assert_called_once_with(
             ca_certs='tls_ca_certs',
             certfile='tls_certfile',
             keyfile='tls_keyfile',
