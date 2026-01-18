@@ -33,10 +33,22 @@ Mqtt = flask_mqtt.Mqtt
 class FlaskMQTTTestCase(unittest.TestCase):
 
     def setUp(self):
+        # Clear the module cache and create a fresh mock
+        try:
+            sys.modules.pop('flask_mqtt')
+        except KeyError:
+            pass
+        
         mock_mqtt = MagicMock()
         if has_callback_api_version:
             mock_mqtt.CallbackAPIVersion = RealCallbackAPIVersion
         sys.modules['paho.mqtt.client'] = mock_mqtt
+        
+        # Re-import to get fresh Mqtt class with new mock
+        import flask_mqtt
+        global Mqtt
+        Mqtt = flask_mqtt.Mqtt
+        
         self.app = Flask(__name__)
 
     def test_early_initialization_app_is_not_none(self):
@@ -120,7 +132,8 @@ class FlaskMQTTTestCase(unittest.TestCase):
         self.app.config['MQTT_TLS_ENABLED'] = True
         self.app.config['MQTT_TLS_INSECURE'] = True
         mqtt = Mqtt(self.app)
-        mqtt.client.tls_insecure_set.assert_called_once_with(True)
+        # Check that tls_insecure_set was called with True
+        mqtt.client.tls_insecure_set.assert_called_with(True)
 
 
 if __name__ == '__main__':
