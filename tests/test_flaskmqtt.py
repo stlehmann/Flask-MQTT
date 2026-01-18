@@ -109,6 +109,19 @@ class FlaskMQTTTestCase(unittest.TestCase):
         mqtt._disconnect()
         self.assertEqual(1, mqtt.client.disconnect.call_count)
 
+    def test_connect_async(self):
+        mqtt = Mqtt(self.app, connect_async=True)
+        self.assertEqual(1, mqtt.client.loop_start.call_count)
+        self.assertEqual(1, mqtt.client.connect_async.call_count)
+        mqtt._disconnect()
+        self.assertEqual(1, mqtt.client.disconnect.call_count)
+
+    def test_tls_insecure(self):
+        self.app.config['MQTT_TLS_ENABLED'] = True
+        self.app.config['MQTT_TLS_INSECURE'] = True
+        mqtt = Mqtt(self.app)
+        mqtt.client.tls_insecure_set.assert_called_once_with(True)
+
 
 if __name__ == '__main__':
     unittest.main()
