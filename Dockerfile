@@ -1,4 +1,4 @@
-FROM python:3.13
+FROM python:3.14
 RUN apt-get update \
  && apt-get install -y --no-install-recommends mosquitto \
  && rm -rf /var/lib/apt/lists/*
