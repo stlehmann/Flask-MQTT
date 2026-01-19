@@ -66,11 +66,26 @@ If you want to subscribe to a topic right from the start make sure to wait with
 the subscription until the client is connected to the broker. Use the
 :py:func:`flask_mqtt.Mqtt.on_connect` decorator for this.
 
+.. important::
+    To avoid race conditions where the MQTT connection is established before
+    your event handlers are registered, you should initialize the MQTT client
+    **after** registering all event handlers. Use the factory pattern with
+    :py:func:`flask_mqtt.Mqtt.init_app` instead of passing the app directly
+    to the constructor.
+
 ::
+
+    from flask import Flask
+    from flask_mqtt import Mqtt
+
+    app = Flask(__name__)
+    mqtt = Mqtt()  # Create without app
 
     @mqtt.on_connect()
     def handle_connect(client, userdata, flags, rc):
         mqtt.subscribe('home/mytopic')
+
+    mqtt.init_app(app)  # Initialize after registering handlers
 
 To handle the subscribed messages you can define a handling function by
 using the :py:func:`flask_mqtt.Mqtt.on_message` decorator.

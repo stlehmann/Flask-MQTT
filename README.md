@@ -86,10 +86,20 @@ To subscribe to a topic simply use `mqtt.subscribe()`. To make sure the
 subscription gets handled correctly on startup place the subscription inside
 an `on_connect()` callback function.
 
+**Important:** To avoid race conditions where the MQTT connection might be established before your event handlers are registered, initialize the MQTT client **after** registering all event handlers:
+
 ```python
+from flask import Flask
+from flask_mqtt import Mqtt
+
+app = Flask(__name__)
+mqtt = Mqtt()  # Create without app
+
 @mqtt.on_connect()
 def handle_connect(client, userdata, flags, rc):
     mqtt.subscribe('home/mytopic')
+
+mqtt.init_app(app)  # Initialize after registering handlers
 ```
 
 To handle the subscribed messages you can define a handling function by

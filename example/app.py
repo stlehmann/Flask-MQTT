@@ -35,7 +35,8 @@ app.config['MQTT_LAST_WILL_QOS'] = 2
 # app.config['MQTT_TLS_INSECURE'] = True
 # app.config['MQTT_TLS_CA_CERTS'] = 'ca.crt'
 
-mqtt = Mqtt(app)
+# Initialize MQTT without app to avoid race conditions
+mqtt = Mqtt()
 socketio = SocketIO(app)
 bootstrap = Bootstrap(app)
 
@@ -76,6 +77,10 @@ def handle_mqtt_message(client, userdata, message):
 def handle_logging(client, userdata, level, buf):
     # print(level, buf)
     pass
+
+
+# Initialize MQTT after registering event handlers
+mqtt.init_app(app)
 
 
 if __name__ == '__main__':
