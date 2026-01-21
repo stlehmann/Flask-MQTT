@@ -118,7 +118,7 @@ class Mqtt:
             self.app = app
         
         if config_prefix + "_CLIENT_ID" in app.config:
-            self.client_id = app.config["MQTT_CLIENT_ID"]
+            self.client_id = app.config[config_prefix + "_CLIENT_ID"]
             
         if isinstance(self.client_id, unicode):
             self.client._client_id = self.client_id.encode("utf-8")
