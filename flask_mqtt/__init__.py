@@ -4,17 +4,17 @@
 :license: MIT, see license file or https://opensource.org/licenses/MIT
 
 """
-import sys
-import ssl
+
 import logging
+import ssl
+import sys
 from collections import namedtuple
+from typing import Any, Callable, Dict, List, Optional, Tuple
+
 from flask import Flask
-from typing import Dict, Any, Callable, Tuple, Optional, List
 
 # noinspection PyUnresolvedReferences
 from paho.mqtt.client import (
-    Client,
-    MQTT_ERR_SUCCESS,
     MQTT_ERR_ACL_DENIED,
     MQTT_ERR_AGAIN,
     MQTT_ERR_AUTH,
@@ -29,6 +29,7 @@ from paho.mqtt.client import (
     MQTT_ERR_PAYLOAD_SIZE,
     MQTT_ERR_PROTOCOL,
     MQTT_ERR_QUEUE_SIZE,
+    MQTT_ERR_SUCCESS,
     MQTT_ERR_TLS,
     MQTT_ERR_UNKNOWN,
     MQTT_LOG_DEBUG,
@@ -36,8 +37,9 @@ from paho.mqtt.client import (
     MQTT_LOG_INFO,
     MQTT_LOG_NOTICE,
     MQTT_LOG_WARNING,
-    MQTTv311,
+    Client,
     MQTTv31,
+    MQTTv311,
 )
 
 # define some alias for python2 compatibility
@@ -45,7 +47,7 @@ if sys.version_info[0] >= 3:
     unicode = str
 
 # current Flask-MQTT version
-__version__ = "1.2.0"
+__version__ = "1.3.0"
 
 #: Container for topic + qos
 TopicQos = namedtuple("TopicQos", ["topic", "qos"])
@@ -64,7 +66,11 @@ class Mqtt:
     """
 
     def __init__(
-        self, app: Flask = None, connect_async: bool = False, mqtt_logging: bool = False, config_prefix: str = "MQTT"
+        self,
+        app: Flask = None,
+        connect_async: bool = False,
+        mqtt_logging: bool = False,
+        config_prefix: str = "MQTT",
     ) -> None:
         self._connect_async: bool = connect_async
         self._connect_handler: Optional[Callable] = None
@@ -75,6 +81,7 @@ class Mqtt:
         # Opt into VERSION1 for backward-compatible callback signatures.
         try:
             from paho.mqtt.client import CallbackAPIVersion
+
             self.client = Client(CallbackAPIVersion.VERSION1)
         except ImportError:
             # For paho-mqtt <2.0.0 where CallbackAPIVersion does not exist.
@@ -111,15 +118,15 @@ class Mqtt:
         if app is not None:
             self.init_app(app, self.config_prefix)
 
-    def init_app(self, app: Flask, config_prefix : str = "MQTT") -> None:
+    def init_app(self, app: Flask, config_prefix: str = "MQTT") -> None:
         """Init the Flask-MQTT addon."""
-        
+
         if self.app is None:
             self.app = app
-        
+
         if config_prefix + "_CLIENT_ID" in app.config:
             self.client_id = app.config[config_prefix + "_CLIENT_ID"]
-            
+
         if isinstance(self.client_id, unicode):
             self.client._client_id = self.client_id.encode("utf-8")
         else:
@@ -145,7 +152,7 @@ class Mqtt:
         self.client.on_disconnect = self._handle_disconnect
 
         if config_prefix + "_USERNAME" in app.config:
-            self.username = app.config[ config_prefix + "_USERNAME"]
+            self.username = app.config[config_prefix + "_USERNAME"]
 
         if config_prefix + "_PASSWORD" in app.config:
             self.password = app.config[config_prefix + "_PASSWORD"]
@@ -172,7 +179,7 @@ class Mqtt:
             self.last_will_qos = app.config[config_prefix + "_LAST_WILL_QOS"]
 
         if config_prefix + "_LAST_WILL_RETAIN" in app.config:
-            self.last_will_retain = app.config[ config_prefix + "_LAST_WILL_RETAIN"]
+            self.last_will_retain = app.config[config_prefix + "_LAST_WILL_RETAIN"]
 
         if self.tls_enabled:
             if config_prefix + "_TLS_CA_CERTS" in app.config:
@@ -190,8 +197,12 @@ class Mqtt:
             if config_prefix + "_TLS_INSECURE" in app.config:
                 self.tls_insecure = app.config[config_prefix + "_TLS_INSECURE"]
 
-            self.tls_cert_reqs = app.config.get(config_prefix + "_TLS_CERT_REQS", ssl.CERT_REQUIRED)
-            self.tls_version = app.config.get(config_prefix + "_TLS_VERSION", ssl.PROTOCOL_TLSv1)
+            self.tls_cert_reqs = app.config.get(
+                config_prefix + "_TLS_CERT_REQS", ssl.CERT_REQUIRED
+            )
+            self.tls_version = app.config.get(
+                config_prefix + "_TLS_VERSION", ssl.PROTOCOL_TLSv1
+            )
 
         # set last will message
         if self.last_will_topic is not None:
@@ -382,18 +393,18 @@ class Mqtt:
     def unsubscribe_all(self) -> None:
         """
         Unsubscribe from all topics.
-        
-        Returns True if all topics are unsubscribed from self.topics, otherwise False 
-        
+
+        Returns True if all topics are unsubscribed from self.topics, otherwise False
+
         """
         topics = list(self.topics.keys())
         for topic in topics:
             self.unsubscribe(topic)
-        
+
         if not len(self.topics):
             return True
         return False
-        
+
     def publish(
         self,
         topic: str,
