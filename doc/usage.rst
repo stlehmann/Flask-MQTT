@@ -429,6 +429,93 @@ Error  Description
            print(f'MQTT Log [{level}]: {buf}')
 
 
+Using Flask-MQTT with Application Servers (uWSGI, Gunicorn)
+-----------------------------------------------------------
+
+When deploying Flask-MQTT with production application servers, you must be careful
+with process and worker configuration.
+
+**Critical configuration requirements:**
+
+1. **Use only one worker/process**
+
+   Flask-MQTT maintains a single persistent MQTT connection. If multiple workers
+   try to share this connection, it will lead to connection failures and timeouts.
+   
+   For **uWSGI**::
+
+       [uwsgi]
+       processes = 1
+       single-interpreter = true
+
+   For **Gunicorn**::
+
+       gunicorn --workers=1 app:app
+
+2. **Increase MQTT_KEEPALIVE for cloud brokers**
+
+   Cloud brokers like The Things Stack, HiveMQ Cloud, and AWS IoT often close
+   connections with low keepalive values. Set a reasonable keepalive interval:
+
+   ::
+
+       app.config['MQTT_KEEPALIVE'] = 60  # default is often too low (5-10 seconds)
+
+   The error of repeated "Sending PINGREQ" / "Receiving PINGRESP" followed by
+   connection drops is usually caused by a keepalive value that's too aggressive
+   for the broker.
+
+3. **Alternative: Use paho-mqtt directly for webhook scenarios**
+
+   If you need to handle occasional webhooks and send MQTT commands, consider using
+   paho-mqtt directly instead of Flask-MQTT. This avoids the complexity of maintaining
+   a persistent connection across multiple requests:
+
+   ::
+
+       import paho.mqtt.client as mqttClient
+       import ssl
+
+       def publish_mqtt_command(broker, port, username, password, topic, payload):
+           client = mqttClient.Client()
+           client.username_pw_set(username, password=password)
+           client.tls_set(ca_certs='ca.pem', certfile=None, keyfile=None,
+                         cert_reqs=ssl.CERT_REQUIRED,
+                         tls_version=ssl.PROTOCOL_TLSv1_2, ciphers=None)
+           client.connect(broker, port=port)
+           client.loop_start()
+           client.publish(topic, payload)
+           time.sleep(1)  # Allow publish to complete
+           client.disconnect()
+           client.loop_stop()
+
+       @app.route('/api/webhook', methods=['POST'])
+       def webhook():
+           cmd = parse_webhook_data(request)
+           if cmd:
+               publish_mqtt_command(
+                   broker='mqtt.example.com',
+                   port=8883,
+                   username='user',
+                   password='pass',
+                   topic='device/command',
+                   payload=cmd
+               )
+           return ("OK", 200)
+
+   This pattern creates a new client for each command, avoiding connection state issues.
+
+4. **Check broker logs for timeout errors**
+
+   If you see repeated errors on the broker side like ``read tcp ... i/o timeout``,
+   this indicates the client is not maintaining the connection properly. Common causes:
+
+   - Too many worker processes trying to use the same MQTT connection
+   - MQTT_KEEPALIVE value too low for the broker
+   - Reloader enabled, creating multiple Flask instances
+   - Eventlet or other async patches interfering with socket operations
+
+
 Debugging
 ---------
 
