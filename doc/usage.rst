@@ -54,6 +54,57 @@ it is common for Flask extension.
 All available configuration variables are listed in the configuration section.
 
 
+Configure TLS/SSL for Cloud Brokers
+------------------------------------
+When using cloud-hosted MQTT brokers like HiveMQ Cloud, AWS IoT, or similar services,
+you typically need to enable TLS encryption. Here's how to configure Flask-MQTT for
+secure connections:
+
+::
+
+    import ssl
+    from flask import Flask
+    from flask_mqtt import Mqtt
+
+    app = Flask(__name__)
+    app.config['MQTT_BROKER_URL'] = 'your-broker.your-region.aws.iot.com'  # Cloud broker URL
+    app.config['MQTT_BROKER_PORT'] = 8883  # default port for TLS-enabled MQTT
+    app.config['MQTT_USERNAME'] = 'your_username'
+    app.config['MQTT_PASSWORD'] = 'your_password'
+    app.config['MQTT_KEEPALIVE'] = 60
+    app.config['MQTT_TLS_ENABLED'] = True  # Enable TLS
+    app.config['MQTT_TLS_VERSION'] = ssl.PROTOCOL_TLSv1_2  # Use TLS v1.2 (or ssl.PROTOCOL_TLS for auto-negotiate)
+    app.config['MQTT_TLS_INSECURE'] = False  # Verify server certificate (keep False for production)
+
+    mqtt = Mqtt(app)
+
+**For HiveMQ Cloud specifically:**
+
+::
+
+    import ssl
+    from flask import Flask
+    from flask_mqtt import Mqtt
+
+    app = Flask(__name__)
+    app.config['MQTT_BROKER_URL'] = 'your-cluster.hivemq.cloud'
+    app.config['MQTT_BROKER_PORT'] = 8883
+    app.config['MQTT_USERNAME'] = 'your_username'
+    app.config['MQTT_PASSWORD'] = 'your_password'
+    app.config['MQTT_TLS_ENABLED'] = True
+    app.config['MQTT_TLS_VERSION'] = ssl.PROTOCOL_TLSv1_2  # HiveMQ Cloud requires TLS v1.2 or higher
+
+    mqtt = Mqtt(app)
+
+**Common cloud broker ports:**
+
+- Port ``1883`` - Unencrypted MQTT (not recommended for cloud)
+- Port ``8883`` - Encrypted MQTT with TLS
+- Port ``8884`` - MQTT over WebSockets with TLS
+
+For detailed TLS configuration options, see the :doc:`configuration` section.
+
+
 Subscribe to a topic
 --------------------
 To subscribe to a topic simply use :py:func:`flask_mqtt.Mqtt.subscribe`.
@@ -238,6 +289,193 @@ messages and publish messages.
         socketio.run(app, host='0.0.0.0', port=5000, use_reloader=False, debug=True)
 
 
-.. _Flask application object: http://flask.pocoo.org/docs/0.12/api/#application-object
+Using Flask-MQTT with SocketIO
+-------------------------------
+
+Flask-MQTT works well with `Flask-SocketIO`_ for real-time communication. However,
+there are important considerations when combining these two extensions:
+
+**Important configuration notes:**
+
+1. **Always disable the reloader**:
+   
+   Even if you're using ``debug=True``, always set ``use_reloader=False`` when using
+   Flask-MQTT. The reloader spawns multiple Flask instances, causing Flask-MQTT to
+   connect multiple times and leading to unpredictable behavior.
+
+   ::
+
+       socketio.run(app, host='0.0.0.0', port=5000, use_reloader=False, debug=True)
+
+2. **Handle broker connection timeouts**:
+
+   If you get a ``TimeoutError`` when initializing ``mqtt = Mqtt(app)``, it may mean:
+
+   - The broker is not running or not accessible at the configured URL/port
+   - The network connection is slow or unstable
+   - The broker is rejecting the connection
+
+   **Solution**: Use the factory pattern to defer connection until after the app context
+   is properly set up, and add error handling:
+
+   ::
+
+       from flask import Flask, current_app
+       from flask_mqtt import Mqtt
+
+       app = Flask(__name__)
+       mqtt = Mqtt()  # Create without app initially
+
+       @mqtt.on_connect()
+       def handle_connect(client, userdata, flags, rc):
+           if rc == 0:
+               current_app.logger.info('MQTT connected successfully')
+               mqtt.subscribe('home/mytopic')
+           else:
+               current_app.logger.error(f'MQTT connection failed with code {rc}')
+
+       # Initialize after all handlers are registered
+       try:
+           mqtt.init_app(app)
+       except Exception as e:
+           app.logger.warning(f'Failed to initialize MQTT: {e}')
+
+3. **Avoid eventlet conflicts**:
+
+   If you use ``eventlet.monkey_patch()`` with Flask-SocketIO, be aware it may interfere
+   with MQTT client socket operations. Test your configuration thoroughly. If you experience
+   issues, try removing the monkey patch or using a different async worker.
+
+4. **Keep broker connection stable**:
+
+   Configure appropriate keepalive and reconnect settings:
+
+   ::
+
+       app.config['MQTT_KEEPALIVE'] = 60  # seconds between pings to broker
+       app.config['MQTT_CLEAN_SESSION'] = True  # clean session on connect
+
+
+Troubleshooting MQTT Connection Errors
+---------------------------------------
+
+When connecting to or publishing to an MQTT broker, you may encounter error messages
+with numeric codes. Here are the common MQTT error codes and their meanings:
+
+.. tabularcolumns:: |p{3cm}|p{11.5cm}|
+
+====== ====================================================================
+Error  Description
+====== ====================================================================
+0      Success - No error
+1      Connection refused, incorrect protocol version
+2      Connection refused, invalid client identifier
+3      Connection refused, server unavailable
+4      Connection refused, bad username or password
+5      Connection refused, not authorized
+6-255  Reserved for future use
+====== ====================================================================
+
+**Common troubleshooting steps:**
+
+1. **Error 4 (Bad username or password)**
+   
+   - Verify your broker credentials in your Flask configuration
+   - Check that ``MQTT_USERNAME`` and ``MQTT_PASSWORD`` are correctly set
+   - Ensure the credentials match what the broker expects
+   - If the broker doesn't require authentication, leave username and password empty
+
+   ::
+
+       app.config['MQTT_USERNAME'] = 'your_username'
+       app.config['MQTT_PASSWORD'] = 'your_password'
+
+2. **Cannot connect to broker**
+
+   - Verify the broker URL and port are correct
+   - Check that the broker is running and accessible
+   - For remote brokers, ensure network connectivity and firewall rules allow the connection
+   - Test connectivity manually: ``telnet broker_url broker_port``
+
+   ::
+
+       app.config['MQTT_BROKER_URL'] = 'mqtt.example.com'
+       app.config['MQTT_BROKER_PORT'] = 1883
+
+3. **Errors during publish/subscribe**
+
+   - Ensure the MQTT client is connected before publishing or subscribing
+   - Use the ``@mqtt.on_connect()`` callback to only subscribe/publish after connection
+   - Check topic names for typos or invalid characters
+   - Verify broker permissions allow your client to publish/subscribe to the topic
+
+   ::
+
+       @mqtt.on_connect()
+       def handle_connect(client, userdata, flags, rc):
+           if rc == 0:  # Connection successful
+               mqtt.subscribe('home/mytopic')
+           else:
+               print(f'Failed to connect, return code {rc}')
+
+4. **Use logging to diagnose issues**
+
+   Enable MQTT logging to get detailed connection and error information:
+
+   ::
+
+       @mqtt.on_log()
+       def handle_logging(client, userdata, level, buf):
+           print(f'MQTT Log [{level}]: {buf}')
+
+
+Debugging
+---------
+
+When debugging Flask-MQTT applications, you may encounter threading-related errors
+such as ``greenlet.error: cannot switch to a different thread``. This occurs because
+Flask-MQTT runs the MQTT client in a background thread, and debuggers pause the main
+thread at breakpoints. When the background thread attempts to communicate or switch
+greenlets while the main thread is frozen, this error is raised.
+
+**Solutions for debugging:**
+
+1. **Use logging instead of breakpoints**: Replace debugger breakpoints with logging
+   statements to track application behavior without freezing threads.
+
+   ::
+
+       @mqtt.on_message()
+       def handle_mqtt_message(client, userdata, message):
+           print(f"Message received: {message.payload.decode()} on topic {message.topic}")
+           # Use logging instead of setting breakpoints here
+           current_app.logger.debug(f"MQTT message: {message.topic}")
+
+2. **Use a remote debugger**: Tools like PyCharm's remote debugging or using ``remote-pdb``
+   can help avoid thread conflicts by connecting via a socket rather than directly
+   pausing the process.
+
+3. **Test without the debugger**: Run the application normally (``python app.py``) to
+   verify MQTT functionality works, then debug specific Flask routes separately.
+
+4. **Disable MQTT temporarily**: For debugging Flask routes not related to MQTT, you can
+   temporarily comment out MQTT initialization to debug without threading complications.
+
+5. **Use conditional initialization**: Initialize MQTT only when not debugging:
+
+   ::
+
+       import os
+       from flask import Flask
+       from flask_mqtt import Mqtt
+
+       app = Flask(__name__)
+       mqtt = Mqtt()
+
+       if not os.environ.get('FLASK_DEBUG'):
+           mqtt.init_app(app)
+
+
+.. _Flask application object: https://flask.palletsprojects.com/en/stable/api/#application-object
 .. _Flask-SocketIO: https://flask-socketio.readthedocs.io/en/latest/
 
