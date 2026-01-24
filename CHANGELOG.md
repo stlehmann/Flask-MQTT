@@ -4,13 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased]
+## **1.3.0**
 
 ### Added
 - support for paho-mqtt 2.0
 - [#192](https://github.com/stlehmann/Flask-MQTT/pull/192) support for Python 3.14
 - [#151](https://github.com/stlehmann/Flask-MQTT/commit/90b11435a32e059a40aa1eccb18f0f32d3351b48) pass disconnect properties to disconnect handler 
 - [#195](https://github.com/stlehmann/Flask-MQTT/commit/9bd89bd9edad131e27e9ef437cd3602dac878288) documentation to avoid race conditions
+- [#198](https://github.com/stlehmann/Flask-MQTT/pull/198) update documentation for paho-mqtt 2.0 changes and TLS support
 
 ### Changed
 - [#193](https://github.com/stlehmann/Flask-MQTT/pull/193) update dependencies and compatibility to paho-mqtt 2.0
