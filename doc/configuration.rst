@@ -60,11 +60,25 @@ Configuration Keys
                                parameter. Defaults to ssl.CERT_REQUIRED.
 
 ``MQTT_TLS_VERSION``           Specifies the version of the SSL/TLS protocol
-                               to be used. By default TLS v1 is used.
-                               Previous versions (all versions beginning with
-                               SSL) are possible but not recommended due to
-                               possible security problems.
-                               Defaults to ssl.PROTOCOL_TLSv1.
+                               to be used. This parameter expects an integer
+                               constant from the ``ssl`` module, not a string.
+                               It is recommended to use TLS v1.2 or higher for
+                               security. Defaults to ``ssl.PROTOCOL_TLSv1``.
+
+                               Example values:
+
+                               - ``ssl.PROTOCOL_TLSv1`` - TLS v1.0 (not recommended)
+                               - ``ssl.PROTOCOL_TLSv1_2`` - TLS v1.2 (recommended)
+                               - ``ssl.PROTOCOL_TLS_CLIENT`` - Highest TLS version
+                                 supported by the client
+                               - ``ssl.PROTOCOL_TLS`` - Auto-negotiate highest
+                                 TLS version (recommended)
+
+                               Usage example::
+
+                                   import ssl
+                                   app.config['MQTT_TLS_ENABLED'] = True
+                                   app.config['MQTT_TLS_VERSION'] = ssl.PROTOCOL_TLSv1_2
 
 ``MQTT_TLS_CIPHERS``           A string specifying which encryption ciphers
                                are allowable for this connection, or None

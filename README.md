@@ -6,14 +6,14 @@ machine-to-machine "Internet of Things" protocol and was designed for extremely
 lightweight publish/subscribe messaging transport.
 
 [![Inactively Maintained](https://img.shields.io/badge/Maintenance%20Level-Inactively%20Maintained-yellowgreen.svg)](https://gist.github.com/cheerfulstoic/d107229326a01ff0f333a1d3476e068d)
-[![Documentation Status](https://readthedocs.org/projects/flask-mqtt/badge/?version=latest)](http://flask-mqtt.readthedocs.io/en/latest/?badge=latest)
+[![Documentation Status](https://readthedocs.org/projects/flask-mqtt/badge/?version=latest)](https://flask-mqtt.readthedocs.io/en/latest/?badge=latest)
 [![PyPI version](https://badge.fury.io/py/Flask-MQTT.svg)](https://badge.fury.io/py/Flask-MQTT)
 [![CI](https://github.com/stlehmann/Flask-MQTT/actions/workflows/ci.yml/badge.svg)](https://github.com/stlehmann/Flask-MQTT/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/github/stlehmann/Flask-MQTT/badge.svg?branch=master)](https://coveralls.io/github/stlehmann/Flask-MQTT?branch=master)
 [![Downloads](https://pepy.tech/badge/flask-mqtt)](https://pepy.tech/project/flask-mqtt)
 [![Downloads](https://pepy.tech/badge/flask-mqtt/week)](https://pepy.tech/project/flask-mqtt/week)
 
-Find the documentation on [http://flask-mqtt.readthedocs.io][2].
+Find the documentation on [https://flask-mqtt.readthedocs.io][2].
 
 ## Features
 
@@ -239,5 +239,5 @@ if __name__ == '__main__':
 ```
 
 [0]: https://github.com/eclipse/paho.mqtt.python
-[1]: http://mqtt.org/
-[2]: http://flask-mqtt.readthedocs.io/en/latest/
+[1]: https://mqtt.org/
+[2]: https://flask-mqtt.readthedocs.io/en/latest/
