@@ -256,7 +256,7 @@ class Mqtt:
                     )
                     raise
 
-                if self._connect_async:
+            if self._connect_async:
                 # if connect_async is used
                 try:
                     self.client.connect_async(
