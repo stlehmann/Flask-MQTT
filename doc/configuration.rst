@@ -39,6 +39,12 @@ Configuration Keys
                                client will send ping messages to the broker.
                                Defaults to 60 seconds.
 
+``MQTT_CONNECTION_TIMEOUT``    Socket timeout in seconds for connection
+                               attempts to the MQTT broker. This controls
+                               how long the client will wait when attempting
+                               to establish a connection before timing out.
+                               Defaults to 5 seconds.
+
 ``MQTT_TLS_ENABLED``           Enable TLS for the connection to the MQTT broker.
                                Use the following config keys to configure TLS.
 
@@ -63,7 +69,7 @@ Configuration Keys
                                to be used. This parameter expects an integer
                                constant from the ``ssl`` module, not a string.
                                It is recommended to use TLS v1.2 or higher for
-                               security. Defaults to ``ssl.PROTOCOL_TLSv1``.
+                               security. Defaults to ``ssl.PROTOCOL_TLSv1_2``.
 
                                Example values:
 
