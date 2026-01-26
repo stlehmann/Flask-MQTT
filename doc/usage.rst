@@ -150,6 +150,74 @@ using the :py:func:`flask_mqtt.Mqtt.on_message` decorator.
             payload=message.payload.decode()
         )
 
+Subscribe to multiple topics
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+To subscribe to multiple topics, simply call :py:func:`flask_mqtt.Mqtt.subscribe`
+multiple times with different topic names:
+
+::
+
+    @mqtt.on_connect()
+    def handle_connect(client, userdata, flags, rc):
+        mqtt.subscribe('home/temperature')
+        mqtt.subscribe('home/humidity')
+        mqtt.subscribe('home/pressure')
+
+You can also use MQTT wildcards to subscribe to multiple topics with a single
+subscription:
+
+::
+
+    @mqtt.on_connect()
+    def handle_connect(client, userdata, flags, rc):
+        mqtt.subscribe('home/#')  # Subscribe to all topics under home/
+        mqtt.subscribe('sensors/+/temperature')  # Subscribe to temperature from all sensors
+
+**MQTT wildcard patterns:**
+
+- ``#`` (multi-level wildcard) - Matches any number of levels. Must be last character.
+  
+  - ``home/#`` matches ``home/kitchen``, ``home/kitchen/temp``, ``home/bedroom/humidity``
+
+- ``+`` (single-level wildcard) - Matches exactly one level.
+  
+  - ``home/+/temperature`` matches ``home/kitchen/temperature``, ``home/bedroom/temperature``
+  - Does not match ``home/temperature`` or ``home/kitchen/sensor/temperature``
+
+**Handling messages from multiple topics:**
+
+The ``on_message()`` decorator receives all messages from all subscribed topics. You can
+check the topic in your handler to process different topics differently:
+
+::
+
+    @mqtt.on_message()
+    def handle_mqtt_message(client, userdata, message):
+        topic = message.topic
+        payload = message.payload.decode()
+        
+        if topic == 'home/temperature':
+            print(f'Temperature: {payload}')
+        elif topic == 'home/humidity':
+            print(f'Humidity: {payload}')
+        elif topic.startswith('sensors/'):
+            sensor_id = topic.split('/')[1]
+            print(f'Sensor {sensor_id}: {payload}')
+
+Alternatively, you can use topic-specific callbacks by passing a topic parameter to
+the decorator:
+
+::
+
+    @mqtt.on_message('home/temperature')
+    def handle_temperature(client, userdata, message):
+        print(f'Temperature: {message.payload.decode()}')
+    
+    @mqtt.on_message('home/humidity')
+    def handle_humidity(client, userdata, message):
+        print(f'Humidity: {message.payload.decode()}')
+
+
 To unsubscribe use :py:func:`flask_mqtt.Mqtt.unsubscribe`.
 
 ::
