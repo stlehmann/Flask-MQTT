@@ -4,17 +4,18 @@
 :license: MIT, see license file or https://opensource.org/licenses/MIT
 
 """
-import sys
-import ssl
+
 import logging
+import socket
+import ssl
+import sys
 from collections import namedtuple
+from typing import Any, Callable, Dict, List, Optional, Tuple
+
 from flask import Flask
-from typing import Dict, Any, Callable, Tuple, Optional, List
 
 # noinspection PyUnresolvedReferences
 from paho.mqtt.client import (
-    Client,
-    MQTT_ERR_SUCCESS,
     MQTT_ERR_ACL_DENIED,
     MQTT_ERR_AGAIN,
     MQTT_ERR_AUTH,
@@ -29,6 +30,7 @@ from paho.mqtt.client import (
     MQTT_ERR_PAYLOAD_SIZE,
     MQTT_ERR_PROTOCOL,
     MQTT_ERR_QUEUE_SIZE,
+    MQTT_ERR_SUCCESS,
     MQTT_ERR_TLS,
     MQTT_ERR_UNKNOWN,
     MQTT_LOG_DEBUG,
@@ -36,8 +38,9 @@ from paho.mqtt.client import (
     MQTT_LOG_INFO,
     MQTT_LOG_NOTICE,
     MQTT_LOG_WARNING,
-    MQTTv311,
+    Client,
     MQTTv31,
+    MQTTv311,
 )
 
 # define some alias for python2 compatibility
@@ -45,7 +48,7 @@ if sys.version_info[0] >= 3:
     unicode = str
 
 # current Flask-MQTT version
-__version__ = "1.2.0"
+__version__ = "1.3.0"
 
 #: Container for topic + qos
 TopicQos = namedtuple("TopicQos", ["topic", "qos"])
@@ -64,14 +67,26 @@ class Mqtt:
     """
 
     def __init__(
-        self, app: Flask = None, connect_async: bool = False, mqtt_logging: bool = False, config_prefix: str = "MQTT"
+        self,
+        app: Flask = None,
+        connect_async: bool = False,
+        mqtt_logging: bool = False,
+        config_prefix: str = "MQTT",
     ) -> None:
         self._connect_async: bool = connect_async
         self._connect_handler: Optional[Callable] = None
         self._disconnect_handler: Optional[Callable] = None
 
         self.app = app
-        self.client = Client()
+        # paho-mqtt >=2.0.0 requires selecting the callback API version.
+        # Opt into VERSION1 for backward-compatible callback signatures.
+        try:
+            from paho.mqtt.client import CallbackAPIVersion
+
+            self.client = Client(CallbackAPIVersion.VERSION1)
+        except ImportError:
+            # For paho-mqtt <2.0.0 where CallbackAPIVersion does not exist.
+            self.client = Client()
         self.connected = False
         self.topics: Dict[str, TopicQos] = {}
 
@@ -85,6 +100,7 @@ class Mqtt:
         self.broker_port: int = 1883
         self.tls_enabled: bool = False
         self.keepalive: int = 60
+        self.connection_timeout: int = 5
         self.last_will_topic: Optional[str] = None
         self.last_will_message: Optional[str] = None
         self.last_will_qos: int = 0
@@ -94,7 +110,7 @@ class Mqtt:
         self.tls_certfile: Optional[str] = None
         self.tls_keyfile: Optional[str] = None
         self.tls_cert_reqs: int = ssl.CERT_NONE
-        self.tls_version: int = ssl.PROTOCOL_TLSv1
+        self.tls_version: int = ssl.PROTOCOL_TLSv1_2
         self.tls_ciphers: Optional[List[str]] = None
         self.tls_insecure: bool = False
 
@@ -104,31 +120,41 @@ class Mqtt:
         if app is not None:
             self.init_app(app, self.config_prefix)
 
-    def init_app(self, app: Flask, config_prefix : str = "MQTT") -> None:
+    def init_app(self, app: Flask, config_prefix: str = "MQTT") -> None:
         """Init the Flask-MQTT addon."""
-        
+
         if self.app is None:
             self.app = app
-        
+
         if config_prefix + "_CLIENT_ID" in app.config:
-            self.client_id = app.config["MQTT_CLIENT_ID"]
-            
+            self.client_id = app.config[config_prefix + "_CLIENT_ID"]
+
         if isinstance(self.client_id, unicode):
             self.client._client_id = self.client_id.encode("utf-8")
         else:
             self.client._client_id = self.client_id
 
-        self.client._transport = app.config.get(config_prefix + "_TRANSPORT", "tcp").lower()
-        self.client._protocol = app.config.get(config_prefix + "_PROTOCOL_VERSION", MQTTv311)
-        self.client._clean_session = self.clean_session
-        self.client.on_connect = self._handle_connect
-        self.client.on_disconnect = self._handle_disconnect
-
         if config_prefix + "_CLEAN_SESSION" in app.config:
             self.clean_session = app.config[config_prefix + "_CLEAN_SESSION"]
 
+        # Set transport/protocol/clean_session with forward-compatibility for paho-mqtt 2.x
+        transport_value = app.config.get(config_prefix + "_TRANSPORT", "tcp").lower()
+        protocol_value = app.config.get(config_prefix + "_PROTOCOL_VERSION", MQTTv311)
+        try:
+            # paho-mqtt 2.x exposes properties
+            self.client.transport = transport_value
+            self.client.protocol = protocol_value
+            self.client.clean_session = self.clean_session
+        except AttributeError:
+            # fall back to older private attributes for 1.x
+            self.client._transport = transport_value
+            self.client._protocol = protocol_value
+            self.client._clean_session = self.clean_session
+        self.client.on_connect = self._handle_connect
+        self.client.on_disconnect = self._handle_disconnect
+
         if config_prefix + "_USERNAME" in app.config:
-            self.username = app.config[ config_prefix + "_USERNAME"]
+            self.username = app.config[config_prefix + "_USERNAME"]
 
         if config_prefix + "_PASSWORD" in app.config:
             self.password = app.config[config_prefix + "_PASSWORD"]
@@ -145,6 +171,9 @@ class Mqtt:
         if config_prefix + "_KEEPALIVE" in app.config:
             self.keepalive = app.config[config_prefix + "_KEEPALIVE"]
 
+        if config_prefix + "_CONNECTION_TIMEOUT" in app.config:
+            self.connection_timeout = app.config[config_prefix + "_CONNECTION_TIMEOUT"]
+
         if config_prefix + "_LAST_WILL_TOPIC" in app.config:
             self.last_will_topic = app.config[config_prefix + "_LAST_WILL_TOPIC"]
 
@@ -155,7 +184,7 @@ class Mqtt:
             self.last_will_qos = app.config[config_prefix + "_LAST_WILL_QOS"]
 
         if config_prefix + "_LAST_WILL_RETAIN" in app.config:
-            self.last_will_retain = app.config[ config_prefix + "_LAST_WILL_RETAIN"]
+            self.last_will_retain = app.config[config_prefix + "_LAST_WILL_RETAIN"]
 
         if self.tls_enabled:
             if config_prefix + "_TLS_CA_CERTS" in app.config:
@@ -173,8 +202,12 @@ class Mqtt:
             if config_prefix + "_TLS_INSECURE" in app.config:
                 self.tls_insecure = app.config[config_prefix + "_TLS_INSECURE"]
 
-            self.tls_cert_reqs = app.config.get(config_prefix + "_TLS_CERT_REQS", ssl.CERT_REQUIRED)
-            self.tls_version = app.config.get(config_prefix + "_TLS_VERSION", ssl.PROTOCOL_TLSv1)
+            self.tls_cert_reqs = app.config.get(
+                config_prefix + "_TLS_CERT_REQS", ssl.CERT_REQUIRED
+            )
+            self.tls_version = app.config.get(
+                config_prefix + "_TLS_VERSION", ssl.PROTOCOL_TLSv1_2
+            )
 
         # set last will message
         if self.last_will_topic is not None:
@@ -191,40 +224,109 @@ class Mqtt:
         if self.username is not None:
             self.client.username_pw_set(self.username, self.password)
 
-        # security
-        if self.tls_enabled:
-            self.client.tls_set(
-                ca_certs=self.tls_ca_certs,
-                certfile=self.tls_certfile,
-                keyfile=self.tls_keyfile,
-                cert_reqs=self.tls_cert_reqs,
-                tls_version=self.tls_version,
-                ciphers=self.tls_ciphers,
-            )
-
-            if self.tls_insecure:
-                self.client.tls_insecure_set(self.tls_insecure)
-
-        if self._connect_async:
-            # if connect_async is used
-            self.client.connect_async(
-                self.broker_url, self.broker_port, keepalive=self.keepalive
-            )
-        else:
-            res = self.client.connect(
-                self.broker_url, self.broker_port, keepalive=self.keepalive
-            )
-
-            if res == 0:
-                logger.debug(
-                    "Connected client '{0}' to broker {1}:{2}".format(
-                        self.client_id, self.broker_url, self.broker_port
+        # Set socket timeout for connection attempts (paho-mqtt uses this internally)
+        # This timeout applies during the socket connection phase
+        default_timeout = None
+        try:
+            default_timeout = socket.getdefaulttimeout()
+            socket.setdefaulttimeout(self.connection_timeout)
+        except Exception:
+            pass  # Continue if socket timeout setting fails
+        
+        try:
+            # security
+            if self.tls_enabled:
+                try:
+                    self.client.tls_set(
+                        ca_certs=self.tls_ca_certs,
+                        certfile=self.tls_certfile,
+                        keyfile=self.tls_keyfile,
+                        cert_reqs=self.tls_cert_reqs,
+                        tls_version=self.tls_version,
+                        ciphers=self.tls_ciphers,
                     )
-                )
+
+                    if self.tls_insecure:
+                        self.client.tls_insecure_set(self.tls_insecure)
+                except Exception as e:
+                    logger.error(
+                        "TLS configuration failed for broker {0}:{1} - {2}: {3}".format(
+                            self.broker_url, self.broker_port, type(e).__name__, str(e)
+                        )
+                    )
+                    raise
+
+            if self._connect_async:
+                # if connect_async is used
+                try:
+                    self.client.connect_async(
+                        self.broker_url, self.broker_port, keepalive=self.keepalive
+                    )
+                except Exception as e:
+                    logger.error(
+                        "Failed to initiate async connection to broker {0}:{1} - {2}: {3}".format(
+                            self.broker_url, self.broker_port, type(e).__name__, str(e)
+                        )
+                    )
+                    raise
             else:
-                logger.error(
-                    "Could not connect to MQTT Broker, Error Code: {0}".format(res)
-                )
+                try:
+                    res = self.client.connect(
+                        self.broker_url, self.broker_port, keepalive=self.keepalive
+                    )
+
+                    if res == 0:
+                        logger.debug(
+                            "Connected client '{0}' to broker {1}:{2}".format(
+                                self.client_id, self.broker_url, self.broker_port
+                            )
+                        )
+                    else:
+                        error_messages = {
+                            MQTT_ERR_AGAIN: "Resource temporarily unavailable",
+                            MQTT_ERR_NOMEM: "Out of memory",
+                            MQTT_ERR_PROTOCOL: "Protocol error",
+                            MQTT_ERR_INVAL: "Invalid function arguments",
+                            MQTT_ERR_NO_CONN: "No connection to broker",
+                            MQTT_ERR_CONN_REFUSED: "Connection refused by broker",
+                            MQTT_ERR_NOT_FOUND: "Resource not found",
+                            MQTT_ERR_CONN_LOST: "Connection lost",
+                            MQTT_ERR_TLS: "TLS error",
+                            MQTT_ERR_PAYLOAD_SIZE: "Payload size error",
+                            MQTT_ERR_NOT_SUPPORTED: "Operation not supported",
+                            MQTT_ERR_AUTH: "Authentication failed",
+                            MQTT_ERR_ACL_DENIED: "ACL denied",
+                            MQTT_ERR_UNKNOWN: "Unknown error",
+                            MQTT_ERR_ERRNO: "System error",
+                            MQTT_ERR_QUEUE_SIZE: "Queue size exceeded",
+                        }
+                        error_msg = error_messages.get(res, "Unknown error")
+                        logger.error(
+                            "Failed to connect to MQTT broker {0}:{1} - Error {2}: {3}".format(
+                                self.broker_url, self.broker_port, res, error_msg
+                            )
+                        )
+                except OSError as e:
+                    logger.error(
+                        "Network error connecting to broker {0}:{1} (timeout: {2}s) - {3}".format(
+                            self.broker_url, self.broker_port, self.connection_timeout, str(e)
+                        )
+                    )
+                    raise
+                except Exception as e:
+                    logger.error(
+                        "Unexpected error connecting to broker {0}:{1} - {2}: {3}".format(
+                            self.broker_url, self.broker_port, type(e).__name__, str(e)
+                        )
+                    )
+                    raise
+        finally:
+            # Restore original socket timeout
+            try:
+                socket.setdefaulttimeout(default_timeout)
+            except Exception:
+                pass
+        
         self.client.loop_start()
 
     def _disconnect(self) -> None:
@@ -245,7 +347,7 @@ class Mqtt:
     def _handle_disconnect(self, client: Client, userdata: Any, rc: int) -> None:
         self.connected = False
         if self._disconnect_handler is not None:
-            self._disconnect_handler()
+            self._disconnect_handler(client, userdata, rc)
 
     def on_topic(self, topic: str) -> Callable:
         """Decorator.
@@ -365,18 +467,18 @@ class Mqtt:
     def unsubscribe_all(self) -> None:
         """
         Unsubscribe from all topics.
-        
-        Returns True if all topics are unsubscribed from self.topics, otherwise False 
-        
+
+        Returns True if all topics are unsubscribed from self.topics, otherwise False
+
         """
         topics = list(self.topics.keys())
         for topic in topics:
             self.unsubscribe(topic)
-        
+
         if not len(self.topics):
             return True
         return False
-        
+
     def publish(
         self,
         topic: str,

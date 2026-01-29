@@ -39,6 +39,12 @@ Configuration Keys
                                client will send ping messages to the broker.
                                Defaults to 60 seconds.
 
+``MQTT_CONNECTION_TIMEOUT``    Socket timeout in seconds for connection
+                               attempts to the MQTT broker. This controls
+                               how long the client will wait when attempting
+                               to establish a connection before timing out.
+                               Defaults to 5 seconds.
+
 ``MQTT_TLS_ENABLED``           Enable TLS for the connection to the MQTT broker.
                                Use the following config keys to configure TLS.
 
@@ -60,11 +66,25 @@ Configuration Keys
                                parameter. Defaults to ssl.CERT_REQUIRED.
 
 ``MQTT_TLS_VERSION``           Specifies the version of the SSL/TLS protocol
-                               to be used. By default TLS v1 is used.
-                               Previous versions (all versions beginning with
-                               SSL) are possible but not recommended due to
-                               possible security problems.
-                               Defaults to ssl.PROTOCOL_TLSv1.
+                               to be used. This parameter expects an integer
+                               constant from the ``ssl`` module, not a string.
+                               It is recommended to use TLS v1.2 or higher for
+                               security. Defaults to ``ssl.PROTOCOL_TLSv1_2``.
+
+                               Example values:
+
+                               - ``ssl.PROTOCOL_TLSv1`` - TLS v1.0 (not recommended)
+                               - ``ssl.PROTOCOL_TLSv1_2`` - TLS v1.2 (recommended)
+                               - ``ssl.PROTOCOL_TLS_CLIENT`` - Highest TLS version
+                                 supported by the client
+                               - ``ssl.PROTOCOL_TLS`` - Auto-negotiate highest
+                                 TLS version (recommended)
+
+                               Usage example::
+
+                                   import ssl
+                                   app.config['MQTT_TLS_ENABLED'] = True
+                                   app.config['MQTT_TLS_VERSION'] = ssl.PROTOCOL_TLSv1_2
 
 ``MQTT_TLS_CIPHERS``           A string specifying which encryption ciphers
                                are allowable for this connection, or None

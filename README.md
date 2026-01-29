@@ -5,15 +5,15 @@ around [paho-mqtt][0] and aims to simplify MQTT integration in Flask. MQTT is a
 machine-to-machine "Internet of Things" protocol and was designed for extremely
 lightweight publish/subscribe messaging transport.
 
-[![Documentation Status](https://readthedocs.org/projects/flask-mqtt/badge/?version=latest)](http://flask-mqtt.readthedocs.io/en/latest/?badge=latest)
+[![Inactively Maintained](https://img.shields.io/badge/Maintenance%20Level-Inactively%20Maintained-yellowgreen.svg)](https://gist.github.com/cheerfulstoic/d107229326a01ff0f333a1d3476e068d)
+[![Documentation Status](https://readthedocs.org/projects/flask-mqtt/badge/?version=latest)](https://flask-mqtt.readthedocs.io/en/latest/?badge=latest)
 [![PyPI version](https://badge.fury.io/py/Flask-MQTT.svg)](https://badge.fury.io/py/Flask-MQTT)
 [![CI](https://github.com/stlehmann/Flask-MQTT/actions/workflows/ci.yml/badge.svg)](https://github.com/stlehmann/Flask-MQTT/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/github/stlehmann/Flask-MQTT/badge.svg?branch=master)](https://coveralls.io/github/stlehmann/Flask-MQTT?branch=master)
-[![Anaconda-Server Badge](https://anaconda.org/conda-forge/flask-mqtt/badges/installer/conda.svg)](https://conda.anaconda.org/conda-forge)
 [![Downloads](https://pepy.tech/badge/flask-mqtt)](https://pepy.tech/project/flask-mqtt)
 [![Downloads](https://pepy.tech/badge/flask-mqtt/week)](https://pepy.tech/project/flask-mqtt/week)
 
-Find the documentation on [http://flask-mqtt.readthedocs.io][2].
+Find the documentation on [https://flask-mqtt.readthedocs.io][2].
 
 ## Features
 
@@ -86,10 +86,20 @@ To subscribe to a topic simply use `mqtt.subscribe()`. To make sure the
 subscription gets handled correctly on startup place the subscription inside
 an `on_connect()` callback function.
 
+**Important:** To avoid race conditions where the MQTT connection might be established before your event handlers are registered, initialize the MQTT client **after** registering all event handlers:
+
 ```python
+from flask import Flask
+from flask_mqtt import Mqtt
+
+app = Flask(__name__)
+mqtt = Mqtt()  # Create without app
+
 @mqtt.on_connect()
 def handle_connect(client, userdata, flags, rc):
     mqtt.subscribe('home/mytopic')
+
+mqtt.init_app(app)  # Initialize after registering handlers
 ```
 
 To handle the subscribed messages you can define a handling function by
@@ -245,5 +255,5 @@ if __name__ == '__main__':
 ```
 
 [0]: https://github.com/eclipse/paho.mqtt.python
-[1]: http://mqtt.org/
-[2]: http://flask-mqtt.readthedocs.io/en/latest/
+[1]: https://mqtt.org/
+[2]: https://flask-mqtt.readthedocs.io/en/latest/

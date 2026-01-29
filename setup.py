@@ -1,4 +1,5 @@
 """Flask-MQTT Setup."""
+
 import io
 import re
 import os
@@ -38,13 +39,13 @@ else:
         url="https://github.com/MrLeeh/Flask-MQTT",
         license="MIT",
         author="Stefan Lehmann",
-        author_email="stefan.st.lehmann@gmail.com",
+        author_email="stlm@posteo.de",
         description="Flask extension for the MQTT protocol",
         long_description=long_description,
         long_description_content_type="text/markdown",
         packages=["flask_mqtt"],
         platforms="any",
-        python_requires=">=3.6",
+        python_requires=">=3.10",
         install_requires=["Flask", "paho-mqtt"],
         classifiers=[
             "Development Status :: 5 - Production/Stable",
