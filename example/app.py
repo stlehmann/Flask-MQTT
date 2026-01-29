@@ -11,6 +11,8 @@ from flask import Flask, render_template
 from flask_mqtt import Mqtt
 from flask_socketio import SocketIO
 from flask_bootstrap import Bootstrap
+# if SSL enabled
+# from flask_mqtt import ssl
 
 eventlet.monkey_patch()
 
@@ -35,8 +37,19 @@ app.config['MQTT_LAST_WILL_QOS'] = 2
 # app.config['MQTT_TLS_INSECURE'] = True
 # app.config['MQTT_TLS_CA_CERTS'] = 'ca.crt'
 
-# Initialize MQTT without app to avoid race conditions
-mqtt = Mqtt()
+# Parmeters for SSL with client certificate
+# app.config['MQTT_TLS_ENABLED']   = True
+# app.config['MQTT_BROKER_URL']    = 'test.mosquitto.org'
+# app.config['MQTT_BROKER_PORT']   = 8884
+# app.config['MQTT_TLS_INSECURE']  = False
+# app.config['MQTT_TLS_CA_CERTS']  = 'mosquitto.org.crt'
+# app.config['MQTT_TLS_CERTFILE']  = 'client.crt'
+# app.config['MQTT_TLS_KEYFILE']   = 'client.key'
+# app.config['MQTT_TLS_VERSION']   = ssl.PROTOCOL_TLSv1_2
+# app.config['MQTT_TLS_CERT_REQS'] = True
+
+
+mqtt = Mqtt(app)
 socketio = SocketIO(app)
 bootstrap = Bootstrap(app)
 
