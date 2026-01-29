@@ -5,7 +5,7 @@ around [paho-mqtt][0] and aims to simplify MQTT integration in Flask. MQTT is a
 machine-to-machine "Internet of Things" protocol and was designed for extremely
 lightweight publish/subscribe messaging transport.
 
-[![Inactively Maintained](https://img.shields.io/badge/Maintenance%20Level-Inactively%20Maintained-yellowgreen.svg)](https://gist.github.com/cheerfulstoic/d107229326a01ff0f333a1d3476e068d)
+[![Active Development](https://img.shields.io/badge/Maintenance%20Level-Actively%20Developed-brightgreen.svg)](https://gist.github.com/cheerfulstoic/d107229326a01ff0f333a1d3476e068d)
 [![Documentation Status](https://readthedocs.org/projects/flask-mqtt/badge/?version=latest)](https://flask-mqtt.readthedocs.io/en/latest/?badge=latest)
 [![PyPI version](https://badge.fury.io/py/Flask-MQTT.svg)](https://badge.fury.io/py/Flask-MQTT)
 [![CI](https://github.com/stlehmann/Flask-MQTT/actions/workflows/ci.yml/badge.svg)](https://github.com/stlehmann/Flask-MQTT/actions/workflows/ci.yml)
