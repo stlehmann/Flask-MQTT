@@ -26,11 +26,11 @@ colorama==0.4.6
     # via tox
 coverage[toml]==7.13.1
     # via
-    #   -r development.in
+    #   -r requirements/development.in
     #   coveralls
     #   pytest-cov
 coveralls==4.0.2
-    # via -r development.in
+    # via -r requirements/development.in
 cryptography==46.0.5
     # via secretstorage
 distlib==0.4.0
@@ -46,7 +46,7 @@ filelock==3.20.3
     #   tox
     #   virtualenv
 flask==3.1.2
-    # via -r common.in
+    # via -r requirements/common.in
 id==1.5.0
     # via twine
 idna==3.11
@@ -89,7 +89,7 @@ more-itertools==10.8.0
     #   jaraco-classes
     #   jaraco-functools
 mypy==1.19.1
-    # via -r development.in
+    # via -r requirements/development.in
 mypy-extensions==1.1.0
     # via mypy
 nh3==0.3.2
@@ -102,7 +102,7 @@ packaging==25.0
     #   tox
     #   twine
 paho-mqtt==2.1.0
-    # via -r common.in
+    # via -r requirements/common.in
 pathspec==1.0.3
     # via mypy
 platformdirs==4.5.1
@@ -126,13 +126,13 @@ pyproject-api==1.10.0
     # via tox
 pytest==9.0.2
     # via
-    #   -r development.in
+    #   -r requirements/development.in
     #   pytest-cov
 pytest-cov==7.0.0
-    # via -r development.in
+    # via -r requirements/development.in
 readme-renderer==44.0
     # via twine
-requests==2.32.5
+requests==2.33.0
     # via
     #   coveralls
     #   id
@@ -152,7 +152,7 @@ secretstorage==3.5.0
 snowballstemmer==3.0.1
     # via sphinx
 sphinx==9.1.0
-    # via -r development.in
+    # via -r requirements/development.in
 sphinxcontrib-applehelp==2.0.0
     # via sphinx
 sphinxcontrib-devhelp==2.0.0
@@ -166,11 +166,11 @@ sphinxcontrib-qthelp==2.0.0
 sphinxcontrib-serializinghtml==2.0.0
     # via sphinx
 tox==4.34.1
-    # via -r development.in
+    # via -r requirements/development.in
 twine==6.2.0
-    # via -r development.in
+    # via -r requirements/development.in
 typing==3.7.4.3
-    # via -r common.in
+    # via -r requirements/common.in
 typing-extensions==4.15.0
     # via mypy
 urllib3==2.6.3
