@@ -23,5 +23,5 @@ paho-mqtt==2.1.0
     # via -r common.in
 typing==3.7.4.3
     # via -r common.in
-werkzeug==3.1.5
+werkzeug==3.1.6
     # via flask
