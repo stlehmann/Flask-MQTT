@@ -124,7 +124,7 @@ pygments==2.20.0
     #   sphinx
 pyproject-api==1.10.0
     # via tox
-pytest==9.0.2
+pytest==9.0.3
     # via
     #   -r development.in
     #   pytest-cov
