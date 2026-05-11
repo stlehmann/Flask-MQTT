@@ -173,7 +173,7 @@ typing==3.7.4.3
     # via -r common.in
 typing-extensions==4.15.0
     # via mypy
-urllib3==2.6.3
+urllib3==2.7.0
     # via
     #   requests
     #   twine
