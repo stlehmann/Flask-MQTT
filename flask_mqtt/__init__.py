@@ -220,7 +220,38 @@ class Mqtt:
 
         self._connect()
 
+    def _isolate_from_green_threads(self) -> None:
+        """Keep paho-mqtt's network loop off the eventlet hub.
+
+        When eventlet monkey-patches the stdlib, paho's loop_start() thread
+        becomes a greenthread whose select() calls are routed through
+        eventlet's green hub. Every incoming packet then pays for hub
+        bookkeeping (event registration/teardown) on top of a greenlet
+        switch, which is far more expensive than a real blocking select()
+        and is the dominant cause of the high CPU usage reported under
+        sustained message throughput (see issue #114). Rebinding the
+        socket/select/threading names used inside paho.mqtt.client to their
+        pre-monkey-patch originals makes the network loop run on a genuine
+        native OS thread, fully isolated from the eventlet hub, while the
+        rest of the Flask app keeps using the cooperative, patched versions.
+        """
+        try:
+            import eventlet.patcher as patcher
+        except ImportError:
+            return
+
+        if not patcher.is_monkey_patched("socket"):
+            return
+
+        import paho.mqtt.client as paho_client
+
+        paho_client.socket = patcher.original("socket")
+        paho_client.select = patcher.original("select")
+        paho_client.threading = patcher.original("threading")
+
     def _connect(self) -> None:
+        self._isolate_from_green_threads()
+
         if self.username is not None:
             self.client.username_pw_set(self.username, self.password)
 
