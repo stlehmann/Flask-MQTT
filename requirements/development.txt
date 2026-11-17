@@ -6,62 +6,65 @@
 #
 alabaster==1.0.0
     # via sphinx
-babel==2.17.0
+annotated-doc==0.0.6
+    # via typer
+annotated-types==0.8.0
+    # via pydantic
+ast-serialize==0.13.1
+    # via mypy
+babel==2.18.0
     # via sphinx
 blinker==1.9.0
     # via flask
-cachetools==6.2.4
+cachetools==8.0.0
     # via tox
-certifi==2026.1.4
+certifi==2026.10.23
     # via requests
-cffi==2.0.0
+cffi==2.1.1
     # via cryptography
-chardet==5.2.0
-    # via tox
-charset-normalizer==3.4.4
+charset-normalizer==3.5.2
     # via requests
-click==8.3.1
+click==8.5.1
     # via flask
 colorama==0.4.6
     # via tox
-coverage[toml]==7.13.1
+coverage[toml]==7.17.3
     # via
     #   -r development.in
     #   coveralls
     #   pytest-cov
-coveralls==4.0.2
+coveralls==4.1.0
     # via -r development.in
-cryptography==46.0.7
+cryptography==50.0.2
     # via secretstorage
-distlib==0.4.0
+distlib==0.4.4
     # via virtualenv
-docopt==0.6.2
-    # via coveralls
 docutils==0.22.4
     # via
     #   readme-renderer
     #   sphinx
-filelock==3.20.3
+filelock==4.2.11
     # via
+    #   python-discovery
     #   tox
     #   virtualenv
 flask==3.1.3
     # via -r common.in
-id==1.5.0
+id==1.6.1
     # via twine
-idna==3.11
+idna==3.20
     # via requests
-imagesize==1.4.1
+imagesize==2.0.1
     # via sphinx
-iniconfig==2.3.0
+iniconfig==2.3.1
     # via pytest
 itsdangerous==2.2.0
     # via flask
 jaraco-classes==3.4.0
     # via keyring
-jaraco-context==6.1.0
+jaraco-context==6.1.2
     # via keyring
-jaraco-functools==4.4.0
+jaraco-functools==4.6.0
     # via keyring
 jeepney==0.9.0
     # via
@@ -73,69 +76,77 @@ jinja2==3.1.6
     #   sphinx
 keyring==25.7.0
     # via twine
-librt==0.7.8
+librt==0.16.0
     # via mypy
-markdown-it-py==4.0.0
+markdown-it-py==4.3.0
     # via rich
-markupsafe==3.0.3
+markupsafe==3.0.4
     # via
     #   flask
     #   jinja2
     #   werkzeug
 mdurl==0.1.2
     # via markdown-it-py
-more-itertools==10.8.0
+more-itertools==11.2.1
     # via
     #   jaraco-classes
     #   jaraco-functools
-mypy==1.19.1
+mypy==2.4.1
     # via -r development.in
-mypy-extensions==1.1.0
+mypy-extensions==1.2.0
     # via mypy
-nh3==0.3.2
+nh3==0.3.7
     # via readme-renderer
-packaging==25.0
+packaging==26.3
     # via
     #   pyproject-api
     #   pytest
     #   sphinx
     #   tox
     #   twine
-paho-mqtt==2.1.0
+    #   virtualenv
+paho-mqtt==2.2.0
     # via -r common.in
-pathspec==1.0.3
+pathspec==1.1.1
     # via mypy
-platformdirs==4.5.1
+platformdirs==4.14.5
     # via
     #   tox
     #   virtualenv
-pluggy==1.6.0
+pluggy==1.7.0
     # via
     #   pytest
     #   pytest-cov
     #   tox
-pycparser==2.23
+pycparser==3.12
     # via cffi
-pygments==2.20.0
+pydantic==2.14.3
+    # via typer
+pydantic-core==2.50.4
+    # via pydantic
+pygments==2.21.0
     # via
     #   pytest
     #   readme-renderer
     #   rich
     #   sphinx
-pyproject-api==1.10.0
+pyproject-api==1.12.5
     # via tox
-pytest==9.0.3
+pytest==9.2.0
     # via
     #   -r development.in
     #   pytest-cov
-pytest-cov==7.0.0
+pytest-cov==7.1.0
     # via -r development.in
-readme-renderer==44.0
+python-discovery==1.9.5
+    # via
+    #   tox
+    #   virtualenv
+readme-renderer==46.0
     # via twine
-requests==2.33.0
+requests==2.34.2
     # via
     #   coveralls
-    #   id
     #   requests-toolbelt
     #   sphinx
     #   twine
@@ -143,15 +154,19 @@ requests-toolbelt==1.0.0
     # via twine
 rfc3986==2.0.0
     # via twine
-rich==14.2.0
-    # via twine
+rich==15.0.0
+    # via
+    #   twine
+    #   typer
 roman-numerals==4.1.0
     # via sphinx
 secretstorage==3.5.0
     # via keyring
-snowballstemmer==3.0.1
+shellingham==1.5.4
+    # via typer
+snowballstemmer==3.1.1
     # via sphinx
-sphinx==9.1.0
+sphinx==9.1.1
     # via -r development.in
 sphinxcontrib-applehelp==2.0.0
     # via sphinx
@@ -159,25 +174,37 @@ sphinxcontrib-devhelp==2.0.0
     # via sphinx
 sphinxcontrib-htmlhelp==2.1.0
     # via sphinx
-sphinxcontrib-jsmath==1.0.1
+sphinxcontrib-jsmath==2.0.0
     # via sphinx
 sphinxcontrib-qthelp==2.0.0
     # via sphinx
 sphinxcontrib-serializinghtml==2.0.0
     # via sphinx
-tox==4.34.1
+tomli-w==1.2.0
+    # via tox
+tox==4.67.13
     # via -r development.in
-twine==6.2.0
+twine==7.0.0
     # via -r development.in
+typer==0.29.1
+    # via coveralls
 typing==3.7.4.3
     # via -r common.in
-typing-extensions==4.15.0
-    # via mypy
-urllib3==2.7.0
+typing-extensions==4.16.0
     # via
+    #   mypy
+    #   pydantic
+    #   pydantic-core
+    #   tox
+    #   typing-inspection
+typing-inspection==0.4.5
+    # via pydantic
+urllib3==2.8.0
+    # via
+    #   id
     #   requests
     #   twine
-virtualenv==20.36.1
+virtualenv==21.15.7
     # via tox
-werkzeug==3.1.6
+werkzeug==3.1.9
     # via flask
