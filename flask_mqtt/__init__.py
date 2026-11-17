@@ -38,9 +38,15 @@ from paho.mqtt.client import (
     MQTT_LOG_INFO,
     MQTT_LOG_NOTICE,
     MQTT_LOG_WARNING,
+    CallbackAPIVersion,
     Client,
+    ConnackCode,
+    MQTTErrorCode,
+    MQTTv5,
     MQTTv31,
     MQTTv311,
+    convert_connack_rc_to_reason_code,
+    convert_disconnect_error_code_to_reason_code,
 )
 
 # define some alias for python2 compatibility
@@ -55,6 +61,24 @@ TopicQos = namedtuple("TopicQos", ["topic", "qos"])
 
 # Init logger
 logger = logging.getLogger(__name__)
+
+
+# paho's v3 disconnect conversion is lossy: other errors arrive as CONN_LOST.
+# CONN_LOST before PROTOCOL: paho < 2.2 maps both to "Unspecified error".
+_DISCONNECT_RCS = (
+    MQTTErrorCode.MQTT_ERR_SUCCESS,
+    MQTTErrorCode.MQTT_ERR_KEEPALIVE,
+    MQTTErrorCode.MQTT_ERR_CONN_LOST,
+    MQTTErrorCode.MQTT_ERR_PROTOCOL,
+)
+
+
+def _to_int(reason_code: Any, convert: Callable, codes: Any) -> int:
+    """Map a v3 ReasonCode back to the paho VERSION1 integer code."""
+    for code in codes:
+        if convert(code) == reason_code:
+            return int(code)
+    return reason_code.value
 
 
 class Mqtt:
@@ -76,17 +100,12 @@ class Mqtt:
         self._connect_async: bool = connect_async
         self._connect_handler: Optional[Callable] = None
         self._disconnect_handler: Optional[Callable] = None
+        self._publish_handler: Optional[Callable] = None
+        self._subscribe_handler: Optional[Callable] = None
+        self._unsubscribe_handler: Optional[Callable] = None
 
         self.app = app
-        # paho-mqtt >=2.0.0 requires selecting the callback API version.
-        # Opt into VERSION1 for backward-compatible callback signatures.
-        try:
-            from paho.mqtt.client import CallbackAPIVersion
-
-            self.client = Client(CallbackAPIVersion.VERSION1)
-        except ImportError:
-            # For paho-mqtt <2.0.0 where CallbackAPIVersion does not exist.
-            self.client = Client()
+        self.client = Client(CallbackAPIVersion.VERSION2)
         self.connected = False
         self.topics: Dict[str, TopicQos] = {}
 
@@ -334,20 +353,80 @@ class Mqtt:
         self.client.disconnect()
         logger.debug("Disconnected from Broker")
 
+    def _is_v5(self) -> bool:
+        return self.client.protocol == MQTTv5
+
     def _handle_connect(
-        self, client: Client, userdata: Any, flags: Dict[str, Any], rc: int
+        self,
+        client: Client,
+        userdata: Any,
+        flags: Any,
+        reason_code: Any,
+        properties: Any = None,
     ) -> None:
+        # hand out what paho's VERSION1 did: flags dict, rc int (v3) or ReasonCode (v5)
+        flags = {"session present": int(flags.session_present)}
+        rc = reason_code if self._is_v5() else _to_int(
+            reason_code, convert_connack_rc_to_reason_code, ConnackCode
+        )
         if rc == MQTT_ERR_SUCCESS:
             self.connected = True
             for key, item in self.topics.items():
                 self.client.subscribe(topic=item.topic, qos=item.qos)
-        if self._connect_handler is not None:
+        if self._connect_handler is None:
+            return
+        if self._is_v5():
+            self._connect_handler(client, userdata, flags, rc, properties)
+        else:
             self._connect_handler(client, userdata, flags, rc)
 
-    def _handle_disconnect(self, client: Client, userdata: Any, rc: int) -> None:
+    def _handle_disconnect(
+        self,
+        client: Client,
+        userdata: Any,
+        disconnect_flags: Any,
+        reason_code: Any,
+        properties: Any = None,
+    ) -> None:
         self.connected = False
         if self._disconnect_handler is not None:
-            self._disconnect_handler(client, userdata, rc)
+            if self._is_v5() and disconnect_flags.is_disconnect_packet_from_server:
+                rc = reason_code
+            else:
+                rc = _to_int(
+                    reason_code, convert_disconnect_error_code_to_reason_code, _DISCONNECT_RCS
+                )
+                properties = None
+            if self._is_v5():
+                self._disconnect_handler(client, userdata, rc, properties)
+            else:
+                self._disconnect_handler(client, userdata, rc)
+
+    def _handle_publish(
+        self, client: Client, userdata: Any, mid: int, reason_code: Any, properties: Any
+    ) -> None:
+        if self._publish_handler is not None:
+            self._publish_handler(client, userdata, mid)
+
+    def _handle_subscribe(
+        self, client: Client, userdata: Any, mid: int, reason_codes: Any, properties: Any
+    ) -> None:
+        if self._subscribe_handler is not None:
+            if self._is_v5():
+                self._subscribe_handler(client, userdata, mid, reason_codes, properties)
+            else:
+                granted_qos = tuple(rc.value for rc in reason_codes)
+                self._subscribe_handler(client, userdata, mid, granted_qos)
+
+    def _handle_unsubscribe(
+        self, client: Client, userdata: Any, mid: int, reason_codes: Any, properties: Any
+    ) -> None:
+        if self._unsubscribe_handler is not None:
+            if self._is_v5():
+                rc = reason_codes[0] if len(reason_codes) == 1 else reason_codes
+                self._unsubscribe_handler(client, userdata, mid, properties, rc)
+            else:
+                self._unsubscribe_handler(client, userdata, mid)
 
     def on_topic(self, topic: str) -> Callable:
         """Decorator.
@@ -581,7 +660,8 @@ class Mqtt:
         """
 
         def decorator(handler: Callable) -> Callable:
-            self.client.on_publish = handler
+            self._publish_handler = handler
+            self.client.on_publish = self._handle_publish
             return handler
 
         return decorator
@@ -598,7 +678,8 @@ class Mqtt:
         """
 
         def decorator(handler: Callable) -> Callable:
-            self.client.on_subscribe = handler
+            self._subscribe_handler = handler
+            self.client.on_subscribe = self._handle_subscribe
             return handler
 
         return decorator
@@ -615,7 +696,8 @@ class Mqtt:
         """
 
         def decorator(handler: Callable) -> Callable:
-            self.client.on_unsubscribe = handler
+            self._unsubscribe_handler = handler
+            self.client.on_unsubscribe = self._handle_unsubscribe
             return handler
 
         return decorator
