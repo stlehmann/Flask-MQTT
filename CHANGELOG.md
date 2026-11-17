@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## **Unreleased**
+
+### Changed
+- use paho-mqtt callback API version 2 internally; handlers get the same arguments as with version 1 (no more DeprecationWarning)
+
+### Fixed
+- MQTT v5 connect and disconnect handlers get the reason code and properties like paho-mqtt's version 1 callbacks
+
+### Removed
+- support for paho-mqtt 1.x (requires paho-mqtt>=2.0.0)
+
 ## **1.3.0**
 
 ### Added

@@ -46,7 +46,7 @@ else:
         packages=["flask_mqtt"],
         platforms="any",
         python_requires=">=3.10",
-        install_requires=["Flask", "paho-mqtt"],
+        install_requires=["Flask", "paho-mqtt>=2.0.0"],
         classifiers=[
             "Development Status :: 5 - Production/Stable",
             "Environment :: Web Environment",
