@@ -339,7 +339,7 @@ class Mqtt:
     ) -> None:
         if rc == MQTT_ERR_SUCCESS:
             self.connected = True
-            for key, item in self.topics.items():
+            for item in list(self.topics.values()):
                 self.client.subscribe(topic=item.topic, qos=item.qos)
         if self._connect_handler is not None:
             self._connect_handler(client, userdata, flags, rc)
